@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projekt Übersicht - Berneby Solutions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function checkAuth() {
+            if (sessionStorage.getItem('auth') === 'true') {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            } else {
+                document.getElementById('login').style.display = 'flex';
+                document.getElementById('content').style.display = 'none';
+            }
+        }
+        
+        function login() {
+            const p = document.getElementById('password').value;
+            if (p === 'berneby') {
+                sessionStorage.setItem('auth', 'true');
+                checkAuth();
+            } else {
+                alert('Falsches Passwort');
+            }
+        }
+
+        window.onload = checkAuth;
+    </script>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans">
+    <!-- Login Overlay -->
+    <div id="login" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Geschützter Bereich</h2>
+            <input type="password" id="password" placeholder="Passwort eingeben" 
+                   class="w-full p-3 border border-gray-300 rounded mb-4 focus:outline-none focus:border-blue-500"
+                   onkeyup="if(event.key === 'Enter') login()">
+            <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded font-semibold hover:bg-blue-700 transition">
+                Zugang freischalten
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="content" class="hidden p-8 max-w-4xl mx-auto">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Projekt Übersicht</h1>
+            <p class="text-gray-600">Wählen Sie eine Website zur Vorschau</p>
+        </header>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <a href="index-entstaubung.html" class="block p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition border border-gray-100 hover:border-blue-500 group">
+                <h3 class="text-xl font-semibold text-gray-800 group-hover:text-blue-600 mb-2">Entstaubungstechnik</h3>
+                <p class="text-gray-500">Entstaubungstechnik Schwarzenberg GmbH</p>
+            </a>
+
+            <a href="index-alfa.html" class="block p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition border border-gray-100 hover:border-blue-500 group">
+                <h3 class="text-xl font-semibold text-gray-800 group-hover:text-blue-600 mb-2">Alfa Küchen</h3>
+                <p class="text-gray-500">ALFA KÜCHEN AUE</p>
+            </a>
+
+            <a href="index-dietel.html" class="block p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition border border-gray-100 hover:border-blue-500 group">
+                <h3 class="text-xl font-semibold text-gray-800 group-hover:text-blue-600 mb-2">Gerd Dietel</h3>
+                <p class="text-gray-500">KFZ-Kennzeichen & Zulassungsdienst</p>
+            </a>
+
+            <a href="index-kabel.html" class="block p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition border border-gray-100 hover:border-blue-500 group">
+                <h3 class="text-xl font-semibold text-gray-800 group-hover:text-blue-600 mb-2">Kabel TV Aue</h3>
+                <p class="text-gray-500">Bestes Netz für Aue & Umgebung</p>
+            </a>
+
+            <a href="Piep-Service.html" class="block p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition border border-gray-100 hover:border-blue-500 group">
+                <h3 class="text-xl font-semibold text-gray-800 group-hover:text-blue-600 mb-2">Partyservice Piep</h3>
+                <p class="text-gray-500">Catering & Partyservice</p>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

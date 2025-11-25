@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="de">
+<head><script>if(!sessionStorage.getItem("auth")){window.location.href="/"}</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kabel TV Aue - Bestes Netz für Aue & Umgebung</title>
+  <meta name="description" content="Ihr regionaler Partner für Highspeed Internet, brillantes Fernsehen und Telefonie zu fairen Preisen. Seit den 80ern direkt vor Ort.">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Babel Standalone for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <style>
+    /* Custom animations */
+    @keyframes bounce-slow {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+    
+    .animate-bounce-slow {
+      animation: bounce-slow 3s ease-in-out infinite;
+    }
+    
+    @keyframes slide-in-from-top {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .slide-in-from-top-5 {
+      animation: slide-in-from-top 0.3s ease-out;
+    }
+    
+    .bg-grid-slate-700\/\[0\.2\] {
+      background-image: 
+        linear-gradient(to right, rgba(51, 65, 85, 0.2) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(51, 65, 85, 0.2) 1px, transparent 1px);
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    
+    // Icon Components (Lucide Icons as React Components)
+    const Icon = ({ children, size = 24, className = "", strokeWidth = 2, fill, ...props }) => (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill={fill || "none"}
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+        {...props}
+      >
+        {children}
+      </svg>
+    );
+    
+    const Phone = (props) => (
+      <Icon {...props}>
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+      </Icon>
+    );
+    
+    const Mail = (props) => (
+      <Icon {...props}>
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+        <polyline points="22,6 12,13 2,6" />
+      </Icon>
+    );
+    
+    const Tv = (props) => (
+      <Icon {...props}>
+        <rect x="2" y="7" width="20" height="15" rx="2" ry="2" />
+        <polyline points="17 2 12 7 7 2" />
+      </Icon>
+    );
+    
+    const Wifi = (props) => (
+      <Icon {...props}>
+        <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+        <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+        <line x1="12" y1="20" x2="12.01" y2="20" />
+      </Icon>
+    );
+    
+    const Smartphone = (props) => (
+      <Icon {...props}>
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+        <line x1="12" x2="12.01" y1="18" y2="18" />
+      </Icon>
+    );
+    
+    const MapPin = (props) => (
+      <Icon {...props}>
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+        <circle cx="12" cy="10" r="3" />
+      </Icon>
+    );
+    
+    const CheckCircle2 = (props) => (
+      <Icon {...props}>
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="9 12 11 14 15 10" />
+      </Icon>
+    );
+    
+    const ArrowRight = (props) => (
+      <Icon {...props}>
+        <line x1="5" x2="19" y1="12" y2="12" />
+        <polyline points="12 5 19 12 12 19" />
+      </Icon>
+    );
+    
+    const Menu = (props) => (
+      <Icon {...props}>
+        <line x1="4" x2="20" y1="12" y2="12" />
+        <line x1="4" x2="20" y1="6" y2="6" />
+        <line x1="4" x2="20" y1="18" y2="18" />
+      </Icon>
+    );
+    
+    const X = (props) => (
+      <Icon {...props}>
+        <line x1="18" x2="6" y1="6" y2="18" />
+        <line x1="6" x2="18" y1="6" y2="18" />
+      </Icon>
+    );
+    
+    const Clock = (props) => (
+      <Icon {...props}>
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </Icon>
+    );
+    
+    const ShieldCheck = (props) => (
+      <Icon {...props}>
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <polyline points="9 12 11 14 15 10" />
+      </Icon>
+    );
+    
+    const Users = (props) => (
+      <Icon {...props}>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </Icon>
+    );
+    
+    const Signal = (props) => (
+      <Icon {...props}>
+        <path d="M2 20h.01" />
+        <path d="M7 20v-4" />
+        <path d="M12 20v-8" />
+        <path d="M17 20V8" />
+        <path d="M22 4v16" />
+      </Icon>
+    );
+    
+    const Navigation = (props) => (
+      <Icon {...props}>
+        <polygon points="3 11 22 2 13 21 11 13 3 11" />
+      </Icon>
+    );
+
+    // --- Design System Constants ---
+    const colors = {
+      primary: "bg-blue-900", // #0F4C81 - Trust Blue
+      primaryHover: "hover:bg-blue-800",
+      accent: "bg-[#e83533]", // #e83533 - CI Red
+      accentHover: "hover:bg-[#c92a28]",
+      bgLight: "bg-slate-50",
+      textMain: "text-slate-900",
+      textMuted: "text-slate-600"
+    };
+
+    // --- Components ---
+
+    const Button = ({ children, variant = 'primary', className = '', ...props }) => {
+      const baseStyle = "inline-flex items-center justify-center rounded-md px-6 py-3 text-sm font-medium shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50";
+      const variants = {
+        primary: `${colors.accent} text-white ${colors.accentHover}`,
+        secondary: "bg-white text-slate-900 border border-slate-200 hover:bg-slate-100",
+        outline: "border border-white text-white hover:bg-white/10"
+      };
+      
+      return (
+        <button className={`${baseStyle} ${variants[variant]} ${className}`} {...props}>
+          {children}
+        </button>
+      );
+    };
+
+    const Section = ({ id, className = "", children }) => (
+      <section id={id} className={`py-16 md:py-24 ${className}`}>
+        {children}
+      </section>
+    );
+
+    const Container = ({ children, className = "" }) => (
+      <div className={`container mx-auto px-4 md:px-6 max-w-7xl ${className}`}>
+        {children}
+      </div>
+    );
+
+    const Card = ({ icon: Icon, title, description, features, featured = false }) => (
+      <div className={`group relative overflow-hidden rounded-2xl border bg-white p-8 transition-all hover:shadow-lg flex flex-col h-full ${featured ? 'border-[#e83533] shadow-md scale-105 z-10 ring-4 ring-[#e83533]/10' : 'border-slate-200'}`}>
+        {featured && (
+          <div className="absolute top-0 right-0 bg-[#e83533] text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+            Empfehlung
+          </div>
+        )}
+        <div className={`mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl ${featured ? 'bg-red-50 text-[#e83533]' : 'bg-blue-50 text-blue-700'}`}>
+          <Icon size={28} />
+        </div>
+        <h3 className="text-2xl font-bold mb-3 text-slate-900">{title}</h3>
+        <p className="text-slate-600 mb-6 flex-grow">{description}</p>
+        <ul className="space-y-3 mb-8">
+          {features.map((feature, idx) => (
+            <li key={idx} className="flex items-start gap-3 text-sm text-slate-600">
+              <CheckCircle2 className={`h-5 w-5 shrink-0 ${featured ? 'text-[#e83533]' : 'text-blue-600'}`} />
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
+        <Button variant={featured ? 'primary' : 'secondary'} className="w-full">
+          Mehr erfahren
+        </Button>
+      </div>
+    );
+
+    // Simulated Map Component
+    const SimulatedMap = () => (
+      <div className="relative w-full h-full bg-[#e5e7eb] overflow-hidden">
+        {/* Abstract Streets */}
+        <div className="absolute top-0 left-1/4 w-4 h-full bg-white transform -skew-x-12"></div>
+        <div className="absolute top-1/3 left-0 w-full h-6 bg-white transform rotate-3"></div>
+        <div className="absolute bottom-1/4 left-0 w-full h-4 bg-white transform -rotate-6"></div>
+        <div className="absolute top-0 right-1/3 w-3 h-full bg-white transform skew-x-6"></div>
+        
+        {/* Map Pin */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center animate-bounce-slow z-10">
+          <MapPin className="text-[#e83533] fill-[#e83533]/20 drop-shadow-lg" size={48} />
+          <div className="bg-white px-3 py-1 rounded-full shadow-md text-xs font-bold mt-1 text-slate-800 whitespace-nowrap">
+            Kabel TV Aue
+          </div>
+        </div>
+
+        {/* UI Overlay */}
+        <div className="absolute bottom-4 right-4 bg-white p-2 rounded shadow text-[10px] text-slate-400">
+          © OpenStreetMap contributors
+        </div>
+      </div>
+    );
+
+    // --- Main Application ---
+
+    function KabelTVAueWebsite() {
+      const [isScrolled, setIsScrolled] = useState(false);
+      const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+      useEffect(() => {
+        const handleScroll = () => setIsScrolled(window.scrollY > 20);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+      }, []);
+
+      const navLinks = [
+        { name: 'Angebote', href: '#angebote' },
+        { name: 'Über uns', href: '#ueber-uns' },
+        { name: 'Service', href: '#service' },
+        { name: 'Kontakt', href: '#kontakt' },
+      ];
+
+      return (
+        <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-red-100 selection:text-red-900">
+          
+          {/* Top Bar - Critical Info */}
+          <div className="bg-slate-900 text-slate-300 text-xs py-2 px-4">
+            <Container className="flex justify-between items-center">
+              <span className="flex items-center gap-2">
+                <Phone size={12} className="text-[#e83533]"/> 
+                <span className="hidden sm:inline">Störungshotline & Service:</span> 
+                <a href="tel:03771551894" className="hover:text-white transition-colors font-medium">03771 55 18 94</a>
+              </span>
+              <div className="flex gap-4">
+                <a href="#kontakt" className="hover:text-white transition-colors">Öffnungszeiten</a>
+                <span className="text-slate-600">|</span>
+                <a href="mailto:info@kabel-tvaue.de" className="hover:text-white transition-colors">info@kabel-tvaue.de</a>
+              </div>
+            </Container>
+          </div>
+
+          {/* Navigation */}
+          <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200 py-3' : 'bg-white py-5 border-b border-transparent'}`}>
+            <Container className="flex items-center justify-between">
+              {/* Logo Branding */}
+              <a href="#" className="flex items-center gap-2 group">
+                <div className="bg-blue-900 text-white font-black text-xl px-2 py-1 rounded-md tracking-tighter group-hover:bg-blue-800 transition-colors">
+                  TV
+                </div>
+                <div className="flex flex-col leading-none">
+                  <span className="font-bold text-slate-900 text-lg">Kabel Aue</span>
+                  <span className="text-[10px] text-slate-500 tracking-widest uppercase font-medium">Der Netzbetreiber</span>
+                </div>
+              </a>
+
+              {/* Desktop Nav */}
+              <nav className="hidden md:flex items-center gap-8">
+                {navLinks.map((link) => (
+                  <a 
+                    key={link.name} 
+                    href={link.href} 
+                    className="text-sm font-medium text-slate-600 hover:text-blue-900 transition-colors"
+                  >
+                    {link.name}
+                  </a>
+                ))}
+                <Button variant="primary" className="ml-4 h-10 px-5 bg-[#e83533] hover:bg-[#c92a28]">
+                  Verfügbarkeit prüfen
+                </Button>
+              </nav>
+
+              {/* Mobile Menu Toggle */}
+              <button 
+                className="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-md"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </Container>
+
+            {/* Mobile Nav Dropdown */}
+            {isMobileMenuOpen && (
+              <div className="md:hidden absolute top-full left-0 w-full bg-white border-b border-slate-200 p-4 shadow-xl animate-in slide-in-from-top-5">
+                <nav className="flex flex-col gap-4">
+                  {navLinks.map((link) => (
+                    <a 
+                      key={link.name} 
+                      href={link.href}
+                      className="text-base font-medium text-slate-900 py-2 border-b border-slate-50"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {link.name}
+                    </a>
+                  ))}
+                  <Button variant="primary" className="w-full mt-2 bg-[#e83533]">
+                    Verfügbarkeit prüfen
+                  </Button>
+                </nav>
+              </div>
+            )}
+          </header>
+
+          <main>
+            {/* HERO SECTION */}
+            <section className="relative overflow-hidden bg-slate-900 py-20 md:py-32">
+              {/* Abstract Background Pattern */}
+              <div className="absolute inset-0 opacity-20">
+                <div className="absolute -top-24 -right-24 h-[500px] w-[500px] rounded-full bg-blue-500 blur-3xl"></div>
+                <div className="absolute bottom-0 left-0 h-[300px] w-[300px] rounded-full bg-[#e83533] blur-3xl"></div>
+              </div>
+              
+              <Container className="relative z-10">
+                <div className="grid md:grid-cols-2 gap-12 items-center">
+                  <div className="space-y-8">
+                    <div className="inline-flex items-center rounded-full border border-blue-700 bg-blue-900/50 px-3 py-1 text-sm font-medium text-blue-100 backdrop-blur-sm">
+                      <span className="mr-2 h-2 w-2 rounded-full bg-green-400 animate-pulse"></span>
+                      Ihr regionaler Partner seit den 80ern
+                    </div>
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
+                      Bestes Netz für <br/>
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+                        Aue & Umgebung
+                      </span>
+                    </h1>
+                    <p className="text-lg md:text-xl text-slate-300 max-w-xl leading-relaxed">
+                      Wir verbinden Tradition mit Zukunft. Highspeed Internet, brillantes Fernsehen und Telefonie zu fairen Preisen. Ohne versteckte Kosten, direkt vor Ort.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <Button variant="primary" className="h-14 px-8 text-base bg-[#e83533] hover:bg-[#c92a28] border-none">
+                        Angebote ansehen
+                      </Button>
+                      <Button variant="outline" className="h-14 px-8 text-base">
+                        Kontakt aufnehmen
+                      </Button>
+                    </div>
+                    
+                    <div className="pt-8 border-t border-slate-800 flex flex-wrap gap-6 md:gap-12 text-slate-400 text-sm font-medium">
+                      <div className="flex items-center gap-2">
+                        <Users size={18} className="text-blue-400"/>
+                        <span>3 starke Vereine</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin size={18} className="text-blue-400"/>
+                        <span>100% Regional</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck size={18} className="text-blue-400"/>
+                        <span>Vor-Ort Service</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Visual / Hero Image Replacement */}
+                  <div className="relative rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700 aspect-square md:aspect-[4/3] shadow-2xl overflow-hidden flex items-center justify-center group">
+                    {/* Placeholder for actual image */}
+                    <div className="absolute inset-0 bg-grid-slate-700/[0.2] bg-[size:40px_40px]"></div>
+                    
+                    {/* Content Z-Index Fix: Main content z-10, Overlay Card z-20 */}
+                    <div className="text-center p-8 z-10 relative">
+                      <div className="mx-auto w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mb-4 backdrop-blur-sm border border-blue-500/30">
+                        <Wifi size={40} className="text-blue-400" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-2">Glasfaser-Power</h3>
+                      <p className="text-slate-400 text-sm">Highspeed Internet für Ihr Zuhause.</p>
+                    </div>
+                    
+                    {/* Floating Card Effect - Moved to Top Right and increased Z-Index to 20 */}
+                    <div className="absolute top-6 right-6 z-20 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl shadow-xl max-w-[200px] animate-bounce-slow hidden sm:block">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span className="text-white text-xs font-bold">System Status</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-white/20 rounded-full overflow-hidden">
+                        <div className="h-full bg-green-400 w-[98%]"></div>
+                      </div>
+                      <div className="text-slate-300 text-[10px] mt-1 text-right">99.9% Uptime</div>
+                    </div>
+                  </div>
+                </div>
+              </Container>
+            </section>
+
+            {/* SERVICES GRID */}
+            <Section id="angebote">
+              <Container>
+                <div className="text-center max-w-3xl mx-auto mb-16">
+                  <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl mb-4">Alles aus einer Hand</h2>
+                  <p className="text-lg text-slate-600">
+                    Unsere Kombi-Pakete für maximale Leistung. Transparent, fair und auf Ihre Bedürfnisse zugeschnitten.
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-8 items-stretch">
+                  <Card 
+                    icon={Tv}
+                    title="Kabelfernsehen"
+                    description="Brillantes HD-Fernsehen mit großer Sendervielfalt direkt aus der Region. Genießen Sie beste Unterhaltung."
+                    features={["Über 100 Sender", "Beste Bildqualität (HD)", "Regionaler Fokus"]}
+                  />
+                  
+                  <Card 
+                    featured={true}
+                    icon={Wifi}
+                    title="Highspeed Internet"
+                    description="Schnelles und stabiles Internet für Streaming, Home-Office und Gaming. Ohne Drosselung."
+                    features={["Bis zu 500 Mbit/s", "Flatrate inklusive", "Kostenloser Router-Check"]}
+                  />
+                  
+                  <Card 
+                    icon={Smartphone}
+                    title="Telefonie"
+                    description="Kristallklare Gespräche ins deutsche Festnetz. Bleiben Sie mit Ihren Liebsten in Verbindung."
+                    features={["Rufnummernmitnahme", "Günstige Minutenpreise", "Flatrate Optionen"]}
+                  />
+                </div>
+              </Container>
+            </Section>
+
+            {/* ÜBER UNS SECTION */}
+            <Section id="ueber-uns" className="bg-slate-100">
+              <Container>
+                <div className="grid lg:grid-cols-2 gap-16 items-center">
+                  <div className="order-2 lg:order-1">
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="h-px w-8 bg-[#e83533]"></span>
+                      <span className="text-[#e83533] font-bold text-sm uppercase tracking-wider">Über uns</span>
+                    </div>
+                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+                      Ihr Kabelnetzbetreiber <br/>
+                      <span className="text-blue-900">direkt vor Ort</span>
+                    </h2>
+                    
+                    <div className="space-y-6 text-slate-600 text-lg leading-relaxed">
+                      <p>
+                        Willkommen beim Auer Kabelnetzbetreiber. Der <strong className="text-slate-900">Kabel TV Aue e.V.</strong> und der <strong className="text-slate-900">Auer Kabelverein 1980 w.V.</strong> bestehen schon seit den 80er Jahren und entstanden ursprünglich aus der Idee, ein flächendeckendes Kabelnetz für TV-Empfang in Aue zu realisieren.
+                      </p>
+                      <p>
+                        Seit dieser Zeit sind das Netz, die Angebote aber auch Aufgaben stetig gewachsen. Wir haben uns zur Aufgabe gemacht, unseren Kunden und Mitgliedern immer das beste Angebot im Bereich TV, Internet und Telefon anzubieten.
+                      </p>
+                      
+                      <blockquote className="border-l-4 border-[#e83533] pl-6 py-2 my-8 bg-white rounded-r-lg shadow-sm">
+                        <p className="italic text-slate-800 font-medium">
+                          "Gerade im Bezug auf die Mitbewerber wollen wir unseren Kunden ein gutes Preis-Leistungsverhältnis bieten."
+                        </p>
+                      </blockquote>
+                      
+                      <p>
+                        Mit unserem guten Vor-Ort-Service sind ein in kurzer Zeit realisierter Breitbandanschluss oder die schnelle Abhilfe im Störungsfall unsere stärksten Argumente.
+                      </p>
+                    </div>
+
+                    <div className="mt-8 grid grid-cols-2 gap-6">
+                      <div className="flex flex-col">
+                        <span className="text-3xl font-bold text-blue-900">1980</span>
+                        <span className="text-sm text-slate-500">Gegründet</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-3xl font-bold text-blue-900">100%</span>
+                        <span className="text-sm text-slate-500">Lokaler Service</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Map Visual Update: Fixed height and simulated map look */}
+                  <div className="order-1 lg:order-2 relative">
+                    <div className="absolute -inset-4 bg-gradient-to-tr from-blue-500 to-[#e83533] rounded-3xl opacity-20 blur-xl rotate-3"></div>
+                    <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-white h-[400px] w-full">
+                      <SimulatedMap />
+                    </div>
+                  </div>
+                </div>
+              </Container>
+            </Section>
+
+            {/* KONTAKT / CTA SECTION */}
+            <Section id="kontakt" className="relative">
+              <Container>
+                <div className="bg-blue-900 rounded-[2rem] p-8 md:p-16 text-center text-white overflow-hidden relative shadow-2xl">
+                  {/* Decorative Elements */}
+                  <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
+                  <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#e83533]/20 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl"></div>
+                  
+                  <div className="relative z-10 max-w-3xl mx-auto">
+                    <h2 className="text-3xl md:text-4xl font-bold mb-6">Bereit für besseres Internet?</h2>
+                    <p className="text-blue-100 text-lg mb-10 leading-relaxed">
+                      Besuchen Sie uns in der Paul-Strößner-Straße 9 oder rufen Sie uns an. 
+                      Wir beraten Sie gerne persönlich, fair und unverbindlich zu Ihrem Anschluss.
+                    </p>
+                    
+                    <div className="grid md:grid-cols-2 gap-6 text-left bg-white/5 p-8 rounded-xl backdrop-blur-sm border border-white/10 mb-10">
+                      <div>
+                        <h4 className="font-bold text-[#e83533] mb-2 flex items-center gap-2">
+                          <MapPin size={18}/> Anschrift
+                        </h4>
+                        <p>Paul-Strößner-Straße 9</p>
+                        <p>08280 Aue-Bad Schlema</p>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-[#e83533] mb-2 flex items-center gap-2">
+                          <Clock size={18}/> Kontakt
+                        </h4>
+                        <p>Tel: 03771 55 18 94</p>
+                        <p>Fax: 03771 55 18 44</p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <a href="tel:03771551894" className="inline-flex items-center justify-center gap-2 bg-white text-blue-900 px-8 py-4 rounded-lg font-bold hover:bg-blue-50 transition-colors shadow-lg">
+                        <Phone size={20} /> 
+                        Anrufen: 03771 55 18 94
+                      </a>
+                      <a href="mailto:info@kabel-tvaue.de" className="inline-flex items-center justify-center gap-2 bg-blue-800 border border-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-lg">
+                        <Mail size={20} /> 
+                        E-Mail schreiben
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </Container>
+            </Section>
+          </main>
+
+          {/* FOOTER */}
+          <footer className="bg-slate-950 text-slate-400 pt-16 pb-8 border-t border-slate-900">
+            <Container>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                {/* Brand Column */}
+                <div>
+                  <div className="flex items-center gap-2 mb-6 text-white">
+                    <div className="bg-blue-900 font-bold text-sm px-2 py-1 rounded">TV</div>
+                    <span className="font-bold text-lg">Kabel Aue</span>
+                  </div>
+                  <p className="text-sm leading-relaxed mb-6">
+                    Ihr zuverlässiger Partner für Telekommunikation in Aue. Regional, persönlich und fair.
+                  </p>
+                  <div className="flex gap-4">
+                    {/* Social placeholders could go here */}
+                  </div>
+                </div>
+
+                {/* Vereine Column */}
+                <div>
+                  <h3 className="text-white font-bold mb-6">Die Vereine</h3>
+                  <ul className="space-y-3 text-sm">
+                    <li className="flex items-start gap-2">
+                      <ArrowRight size={14} className="mt-1 text-blue-500"/> Kabel TV Aue e.V.
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <ArrowRight size={14} className="mt-1 text-blue-500"/> Auer Kabelverein 1980 w.V.
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <ArrowRight size={14} className="mt-1 text-blue-500"/> Kabel TV Aue/Alberoda-Lößnitz e.V.
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Links Column */}
+                <div>
+                  <h3 className="text-white font-bold mb-6">Service</h3>
+                  <ul className="space-y-3 text-sm">
+                    <li><a href="#" className="hover:text-[#e83533] transition-colors">Angebotsübersicht</a></li>
+                    <li><a href="#" className="hover:text-[#e83533] transition-colors">Programmübersicht</a></li>
+                    <li><a href="#" className="hover:text-[#e83533] transition-colors">Stellenanzeigen</a></li>
+                    <li><a href="#" className="hover:text-[#e83533] transition-colors">Sächsisches Privatrundfunkgesetz</a></li>
+                  </ul>
+                </div>
+
+                {/* Rechtliches Column */}
+                <div>
+                  <h3 className="text-white font-bold mb-6">Rechtliches</h3>
+                  <ul className="space-y-3 text-sm">
+                    <li><a href="#" className="hover:text-white transition-colors">Impressum</a></li>
+                    <li><a href="#" className="hover:text-white transition-colors">Datenschutzerklärung</a></li>
+                    <li><a href="#" className="hover:text-white transition-colors">Satzung</a></li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
+                <p>© {new Date().getFullYear()} Kabel TV Aue. Alle Rechte vorbehalten.</p>
+                <p>Design & Entwicklung: Webdesign-Maestro</p>
+              </div>
+            </Container>
+          </footer>
+        </div>
+      );
+    }
+
+    // Render the app
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<KabelTVAueWebsite />);
+  </script>
+</body>
+</html>

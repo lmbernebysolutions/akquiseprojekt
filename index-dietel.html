@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="de">
+<head><script>if(!sessionStorage.getItem("auth")){window.location.href="/"}</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerd Dietel - KFZ-Kennzeichen & Zulassungsdienst in Aue-Bad Schlema</title>
+  <meta name="description" content="Ihr zuverlässiger Partner für KFZ-Zulassung, Kennzeichen-Prägung und Versicherungen. Schnell, kompetent, lokal in Aue-Bad Schlema.">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Babel Standalone for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <style>
+    /* Custom styles for animations */
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    .animate-in {
+      animation-fill-mode: both;
+    }
+    
+    .fade-in {
+      animation: fade-in 0.2s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+    
+    // Icon Components (Lucide Icons as React Components)
+    const Icon = ({ children, size = 24, className = "", strokeWidth = 2, fill, ...props }) => (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill={fill || "none"}
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+        {...props}
+      >
+        {children}
+      </svg>
+    );
+    
+    const Car = (props) => (
+      <Icon {...props}>
+        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18.7 5c-.3-.8-1-1.3-1.9-1.3H3.2c-.9 0-1.6.5-1.9 1.3L1.5 11c-.8.2-1.5 1-1.5 1.9v3c0 .6.4 1 1 1h2" />
+        <circle cx="7" cy="17" r="2" />
+        <circle cx="17" cy="17" r="2" />
+        <path d="M5 17h14" />
+      </Icon>
+    );
+    
+    const FileText = (props) => (
+      <Icon {...props}>
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" x2="8" y1="13" y2="13" />
+        <line x1="16" x2="8" y1="17" y2="17" />
+        <polyline points="10 9 9 9 8 9" />
+      </Icon>
+    );
+    
+    const Phone = (props) => (
+      <Icon {...props}>
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+      </Icon>
+    );
+    
+    const Mail = (props) => (
+      <Icon {...props}>
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+        <polyline points="22,6 12,13 2,6" />
+      </Icon>
+    );
+    
+    const MapPin = (props) => (
+      <Icon {...props}>
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+        <circle cx="12" cy="10" r="3" />
+      </Icon>
+    );
+    
+    const Clock = (props) => (
+      <Icon {...props}>
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </Icon>
+    );
+    
+    const CheckCircle2 = (props) => (
+      <Icon {...props}>
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="9 12 11 14 15 10" />
+      </Icon>
+    );
+    
+    const Download = (props) => (
+      <Icon {...props}>
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" x2="12" y1="15" y2="3" />
+      </Icon>
+    );
+    
+    const Menu = (props) => (
+      <Icon {...props}>
+        <line x1="4" x2="20" y1="12" y2="12" />
+        <line x1="4" x2="20" y1="6" y2="6" />
+        <line x1="4" x2="20" y1="18" y2="18" />
+      </Icon>
+    );
+    
+    const X = (props) => (
+      <Icon {...props}>
+        <line x1="18" x2="6" y1="6" y2="18" />
+        <line x1="6" x2="18" y1="6" y2="18" />
+      </Icon>
+    );
+    
+    const Printer = (props) => (
+      <Icon {...props}>
+        <polyline points="6 9 6 2 18 2 18 9" />
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+        <rect x="6" y="14" width="12" height="8" />
+      </Icon>
+    );
+    
+    const ShieldCheck = (props) => (
+      <Icon {...props}>
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <polyline points="9 12 11 14 15 10" />
+      </Icon>
+    );
+    
+    const ArrowRight = (props) => (
+      <Icon {...props}>
+        <line x1="5" x2="19" y1="12" y2="12" />
+        <polyline points="12 5 19 12 12 19" />
+      </Icon>
+    );
+    
+    const Scale = (props) => (
+      <Icon {...props}>
+        <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+        <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+        <path d="M7 21h10" />
+        <path d="M12 3v18" />
+        <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
+      </Icon>
+    );
+    
+    const Info = (props) => (
+      <Icon {...props}>
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" x2="12" y1="16" y2="12" />
+        <line x1="12" x2="12.01" y1="8" y2="8" />
+      </Icon>
+    );
+    
+    const ChevronRight = (props) => (
+      <Icon {...props}>
+        <polyline points="9 18 15 12 9 6" />
+      </Icon>
+    );
+
+    // --- UNTERNEHMENSDATEN ---
+    const COMPANY = {
+      name: "Gerd Dietel",
+      subline: "KFZ-Kennzeichen & Zulassungsdienst",
+      owner: "Gerd Dietel",
+      address: {
+        street: "Wettinerstraße 78",
+        zip: "08280",
+        city: "Aue-Bad Schlema"
+      },
+      contact: {
+        phone: "03771 / 510 50",
+        fax: "03771 / 123 789 0",
+        mobile: "0170 / 4 20 56 58",
+        email: "info@erz-autoschilder.de"
+      }
+    };
+
+    // --- SERVICES DATA ---
+    const SERVICES = [
+      {
+        id: 1,
+        title: "KFZ-Zulassungsdienst",
+        description: "Wir erledigen Ihre Behördengänge. Anmeldung, Abmeldung und Ummeldung ohne Wartezeit.",
+        icon: <Car className="w-8 h-8 text-blue-600" />,
+        features: ["Anmeldung & Abmeldung", "Kurzzeitkennzeichen", "Wunschkennzeichen"]
+      },
+      {
+        id: 2,
+        title: "Kennzeichen-Prägung",
+        description: "Hochwertige DIN-zertifizierte KFZ-Kennzeichen sofort zum Mitnehmen. Alle Größen verfügbar.",
+        icon: <Printer className="w-8 h-8 text-blue-600" />,
+        features: ["Euro-Kennzeichen", "Saisonkennzeichen", "Motorradschilder"]
+      },
+      {
+        id: 3,
+        title: "Versicherungen",
+        description: "Passende eVB-Nummern für Kurzzeit- und Ausfuhrkennzeichen direkt bei uns erhältlich.",
+        icon: <ShieldCheck className="w-8 h-8 text-blue-600" />,
+        features: ["eVB-Nummer sofort", "Kurzzeitversicherung", "Zollversicherung"]
+      }
+    ];
+
+    // --- DOWNLOADS DATA (FIX: Echte Dateinamen simulieren) ---
+    const DOWNLOADS = [
+      { name: "Kaufvertrag (Muster)", size: "120 KB", file: "kaufvertrag.pdf" },
+      { name: "Vollmacht Zulassungsstelle", size: "85 KB", file: "vollmacht.pdf" },
+      { name: "SEPA-Lastschriftmandat", size: "95 KB", file: "sepa.pdf" },
+      { name: "Verlusterklärung Fahrzeugschein", size: "110 KB", file: "verlust.pdf" }
+    ];
+
+    // --- COMPONENTS ---
+
+    // Modal für Impressum (Lösung für Kritikpunkt 1)
+    const LegalModal = ({ isOpen, onClose, content }) => {
+      if (!isOpen) return null;
+      return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto relative">
+            <button 
+              onClick={onClose}
+              className="absolute top-4 right-4 p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors"
+              aria-label="Schließen"
+            >
+              <X size={20} />
+            </button>
+            <div className="p-8">
+              <h2 className="text-2xl font-bold mb-6 text-slate-900 flex items-center gap-2">
+                <Scale className="text-blue-600" />
+                Rechtliche Hinweise
+              </h2>
+              <div className="prose prose-slate prose-sm max-w-none">
+                {content}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const SectionTitle = ({ title, subtitle, align = "center" }) => (
+      <div className={`mb-12 ${align === "left" ? "text-left" : "text-center"} max-w-3xl mx-auto`}>
+        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight">{title}</h2>
+        {subtitle && <p className="text-slate-600 text-lg leading-relaxed">{subtitle}</p>}
+        <div className={`h-1.5 w-24 bg-blue-600 rounded-full mt-6 ${align === "left" ? "" : "mx-auto"}`}></div>
+      </div>
+    );
+
+    const Button = ({ children, variant = 'primary', className = '', ...props }) => {
+      const baseStyle = "inline-flex items-center justify-center rounded-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 touch-manipulation";
+      const variants = {
+        primary: "px-6 py-3.5 bg-blue-700 text-white hover:bg-blue-800 focus:ring-blue-600 shadow-lg shadow-blue-700/20 hover:shadow-blue-700/30",
+        secondary: "px-6 py-3.5 bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 focus:ring-slate-200 hover:border-blue-200",
+        outline: "px-6 py-3.5 border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm"
+      };
+      
+      return (
+        <button className={`${baseStyle} ${variants[variant]} ${className}`} {...props}>
+          {children}
+        </button>
+      );
+    };
+
+    // --- MAIN APP ---
+
+    function App() {
+      const [isMenuOpen, setIsMenuOpen] = useState(false);
+      const [scrolled, setScrolled] = useState(false);
+      const [isLegalOpen, setIsLegalOpen] = useState(false);
+      const heroRef = useRef(null);
+
+      // FIX Kritikpunkt 2: Performance (IntersectionObserver statt Scroll Listener)
+      useEffect(() => {
+        const observer = new IntersectionObserver(
+          ([entry]) => {
+            setScrolled(!entry.isIntersecting);
+          },
+          { threshold: 0.1, rootMargin: "-50px 0px 0px 0px" }
+        );
+
+        if (heroRef.current) {
+          observer.observe(heroRef.current);
+        }
+
+        return () => observer.disconnect();
+      }, []);
+
+      // FIX Kritikpunkt 3: Body Scroll Lock bei mobilem Menü
+      useEffect(() => {
+        if (isMenuOpen) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = 'unset';
+        }
+        return () => { document.body.style.overflow = 'unset'; };
+      }, [isMenuOpen]);
+
+      const scrollTo = (id) => {
+        setIsMenuOpen(false);
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+      };
+
+      // Impressum Content (aus index.php übernommen)
+      const impressumContent = (
+        <>
+          <h3>Impressum</h3>
+          <p><strong>{COMPANY.name}</strong><br/>{COMPANY.subline}</p>
+          <p>
+            Inhaber: {COMPANY.owner}<br/>
+            {COMPANY.address.street}<br/>
+            {COMPANY.address.zip} {COMPANY.address.city}
+          </p>
+          <p>
+            <strong>Kontakt:</strong><br/>
+            Telefon: {COMPANY.contact.phone}<br/>
+            Fax: {COMPANY.contact.fax}<br/>
+            Mobil: {COMPANY.contact.mobile}<br/>
+            E-Mail: {COMPANY.contact.email}
+          </p>
+          <h4>1. Haftungsausschluss</h4>
+          <p>Der Autor übernimmt keinerlei Gewähr für die Aktualität, Korrektheit, Vollständigkeit oder Qualität der bereitgestellten Informationen. Haftungsansprüche gegen den Autor, welche sich auf Schäden materieller oder ideeller Art beziehen, die durch die Nutzung oder Nichtnutzung der dargebotenen Informationen verursacht wurden, sind grundsätzlich ausgeschlossen.</p>
+          <h4>2. Urheberrecht</h4>
+          <p>Alle Inhalte dieser Website sind urheberrechtlich geschützt. Eine Vervielfältigung ohne ausdrückliche Zustimmung ist nicht gestattet.</p>
+          <h4>3. Datenschutz</h4>
+          <p>Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener Daten möglich. Soweit auf unseren Seiten personenbezogene Daten (beispielsweise Name, Anschrift oder eMail-Adressen) erhoben werden, erfolgt dies, soweit möglich, stets auf freiwilliger Basis.</p>
+        </>
+      );
+
+      return (
+        <div className="min-h-screen font-sans text-slate-900 bg-white selection:bg-blue-100 selection:text-blue-900">
+          
+          <LegalModal 
+            isOpen={isLegalOpen} 
+            onClose={() => setIsLegalOpen(false)} 
+            content={impressumContent} 
+          />
+
+          {/* NAVIGATION */}
+          <header 
+            className={`fixed top-0 w-full z-40 transition-all duration-300 ${
+              scrolled 
+                ? 'bg-white/95 backdrop-blur-md shadow-md py-3 border-b border-slate-100' 
+                : 'bg-white/0 py-6'
+            }`}
+          >
+            <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
+              {/* Logo */}
+              <div 
+                className="flex items-center gap-3 cursor-pointer group" 
+                onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
+              >
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg transition-colors duration-300 ${scrolled ? 'bg-blue-700 text-white shadow-blue-700/20' : 'bg-white text-blue-700'}`}>
+                  <Car size={24} />
+                </div>
+                <div className="leading-none">
+                  <div className={`font-bold text-xl tracking-tight transition-colors ${scrolled ? 'text-slate-900' : 'text-white'}`}>
+                    {COMPANY.name}
+                  </div>
+                  <div className={`text-xs font-semibold tracking-wide uppercase mt-0.5 transition-colors ${scrolled ? 'text-blue-700' : 'text-blue-200'}`}>
+                    Autoschilder & Zulassung
+                  </div>
+                </div>
+              </div>
+
+              {/* Desktop Nav */}
+              <nav className="hidden lg:flex items-center gap-8">
+                {['Leistungen', 'Formulare', 'Kontakt'].map((item) => (
+                  <button 
+                    key={item} 
+                    onClick={() => scrollTo(item.toLowerCase())}
+                    className={`text-sm font-semibold transition-colors hover:text-blue-400 ${scrolled ? 'text-slate-600' : 'text-white/90'}`}
+                  >
+                    {item}
+                  </button>
+                ))}
+                {scrolled ? (
+                  <button 
+                    onClick={() => scrollTo('kontakt')} 
+                    className="inline-flex items-center justify-center px-5 py-2 text-sm rounded-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 touch-manipulation bg-blue-700 text-white hover:bg-blue-800 focus:ring-blue-600 shadow-lg shadow-blue-700/20 hover:shadow-blue-700/30"
+                  >
+                    <Phone size={16} className="mr-2" />
+                    {COMPANY.contact.phone.split('/')[0]}
+                  </button>
+                ) : (
+                  <button 
+                    onClick={() => scrollTo('kontakt')} 
+                    className="inline-flex items-center justify-center px-5 py-2 text-sm rounded-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 touch-manipulation bg-white text-blue-700 hover:bg-blue-50 shadow-none border-transparent"
+                  >
+                    <Phone size={16} className="mr-2" />
+                    {COMPANY.contact.phone.split('/')[0]}
+                  </button>
+                )}
+              </nav>
+
+              {/* Mobile Toggle (FIX: Accessibility) */}
+              <button 
+                className={`lg:hidden p-2 rounded-lg transition-colors ${scrolled ? 'text-slate-700 hover:bg-slate-100' : 'text-white hover:bg-white/10'}`}
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label={isMenuOpen ? "Menü schließen" : "Menü öffnen"}
+                aria-expanded={isMenuOpen}
+              >
+                {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              </button>
+            </div>
+
+            {/* Mobile Menu Overlay (FIX: Scroll Lock & Animation) */}
+            <div className={`absolute top-full left-0 w-full bg-white border-b border-slate-100 shadow-2xl lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'}`}>
+              <div className="p-4 flex flex-col gap-2">
+                {['Leistungen', 'Formulare', 'Kontakt'].map((item) => (
+                  <button 
+                    key={item} 
+                    onClick={() => scrollTo(item.toLowerCase())}
+                    className="text-left p-4 rounded-xl hover:bg-blue-50 font-semibold text-slate-700 flex justify-between items-center group"
+                  >
+                    {item}
+                    <ChevronRight size={16} className="text-blue-300 group-hover:text-blue-600 transition-colors" />
+                  </button>
+                ))}
+                <div className="h-px bg-slate-100 my-2"></div>
+                <a 
+                  href={`tel:${COMPANY.contact.phone}`}
+                  className="flex items-center justify-center gap-2 p-4 rounded-xl bg-blue-700 text-white font-bold shadow-lg shadow-blue-700/20 active:scale-[0.98] transition-transform"
+                >
+                  <Phone size={18} />
+                  Anrufen: {COMPANY.contact.phone.split('/')[0]}
+                </a>
+              </div>
+            </div>
+          </header>
+
+          {/* HERO SECTION (mit Ref für IntersectionObserver) */}
+          <div ref={heroRef}>
+            <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-40 bg-slate-900 overflow-hidden">
+              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1617788138017-80ad40651399?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center opacity-20"></div>
+              <div className="absolute inset-0 bg-gradient-to-b from-slate-900/90 via-slate-900/70 to-slate-900"></div>
+              
+              <div className="container mx-auto px-4 relative z-10">
+                <div className="max-w-3xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-300 text-xs font-bold uppercase tracking-wider mb-8 backdrop-blur-sm">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                    </span>
+                    Ihr Partner in {COMPANY.address.city}
+                  </div>
+                  
+                  <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white mb-8 leading-[1.1] tracking-tight">
+                    Wir kümmern uns um <br/>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-100">Ihr Kennzeichen.</span>
+                  </h1>
+                  
+                  <p className="text-lg sm:text-xl text-slate-300 mb-10 leading-relaxed max-w-2xl font-medium">
+                    Schluss mit Behördenstress. Wir übernehmen Ihre KFZ-Zulassung, Abmeldung und prägen Ihre Schilder direkt vor Ort – schnell, zuverlässig & zertifiziert.
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Button onClick={() => scrollTo('leistungen')} className="w-full sm:w-auto">
+                      Unsere Leistungen
+                      <ArrowRight size={18} className="ml-2" />
+                    </Button>
+                    <Button variant="outline" onClick={() => scrollTo('kontakt')} className="w-full sm:w-auto">
+                      Kontakt aufnehmen
+                    </Button>
+                  </div>
+
+                  {/* Trust Badges */}
+                  <div className="mt-12 flex flex-wrap gap-6 text-slate-400 text-sm font-medium">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 size={18} className="text-blue-500" />
+                      <span>DIN-Zertifiziert</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 size={18} className="text-blue-500" />
+                      <span>Offizieller Zulassungsdienst</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 size={18} className="text-blue-500" />
+                      <span>Seit über 25 Jahren</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          {/* SERVICES SECTION */}
+          <section id="leistungen" className="py-24 bg-white">
+            <div className="container mx-auto px-4">
+              <SectionTitle 
+                title="Unser Rundum-Service" 
+                subtitle="Wir bieten Ihnen den kompletten Service aus einer Hand: Von der Versicherungskarte bis zum montierten Schild."
+              />
+              
+              <div className="grid md:grid-cols-3 gap-8">
+                {SERVICES.map((service) => (
+                  <div key={service.id} className="group p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300">
+                    <div className="mb-6 w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center text-blue-600 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                      {React.cloneElement(service.icon, { className: "w-8 h-8" })}
+                    </div>
+                    <h3 className="text-xl font-bold mb-4 text-slate-900">{service.title}</h3>
+                    <p className="text-slate-600 mb-8 leading-relaxed">{service.description}</p>
+                    <ul className="space-y-3 border-t border-slate-200 pt-6">
+                      {service.features.map((feature, i) => (
+                        <li key={i} className="flex items-start gap-3 text-sm text-slate-700 font-medium">
+                          <CheckCircle2 size={16} className="text-blue-600 mt-0.5 shrink-0" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* DOWNLOADS / FORMULARE (FIX: Semantische Links) */}
+          <section id="formulare" className="py-24 bg-slate-50 relative">
+            {/* Decorative Pattern */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-[0.03] pointer-events-none">
+              <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-blue-600 blur-3xl"></div>
+              <div className="absolute top-1/2 -left-24 w-72 h-72 rounded-full bg-blue-400 blur-3xl"></div>
+            </div>
+
+            <div className="container mx-auto px-4 relative">
+              <div className="grid lg:grid-cols-2 gap-16 items-start">
+                <div className="lg:sticky lg:top-32">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider mb-6">
+                    <FileText size={14} />
+                    Service Center
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
+                    Wichtige Unterlagen <br/>
+                    <span className="text-blue-700">sofort griffbereit.</span>
+                  </h2>
+                  <p className="text-slate-600 mb-8 leading-relaxed text-lg">
+                    Für eine reibungslose Zulassung benötigen Sie oft spezielle Vollmachten oder Erklärungen. 
+                    Laden Sie diese hier bequem herunter, füllen Sie sie aus und bringen Sie sie mit.
+                  </p>
+                  
+                  <div className="p-6 bg-white rounded-xl border border-blue-100 shadow-sm">
+                    <h4 className="font-bold text-slate-900 mb-3 flex items-center gap-2">
+                      <Clock size={18} className="text-blue-600" />
+                      Checkliste für Ihren Besuch:
+                    </h4>
+                    <ul className="space-y-2 text-sm text-slate-600">
+                      <li className="flex gap-2"><CheckCircle2 size={16} className="text-green-500 shrink-0" /> Personalausweis / Reisepass</li>
+                      <li className="flex gap-2"><CheckCircle2 size={16} className="text-green-500 shrink-0" /> Zulassungsbescheinigung I & II</li>
+                      <li className="flex gap-2"><CheckCircle2 size={16} className="text-green-500 shrink-0" /> eVB-Nummer (Versicherung)</li>
+                      <li className="flex gap-2"><CheckCircle2 size={16} className="text-green-500 shrink-0" /> SEPA-Mandat für KFZ-Steuer</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {DOWNLOADS.map((file, idx) => (
+                    <a 
+                      key={idx} 
+                      href={`#`} // In Production: Real link to PDF
+                      onClick={(e) => e.preventDefault()} // Mock prevent
+                      className="group flex items-center justify-between p-5 bg-white hover:bg-blue-50 rounded-2xl shadow-sm hover:shadow-md border border-slate-200 hover:border-blue-200 transition-all duration-200 cursor-pointer"
+                      aria-label={`Download ${file.name}`}
+                    >
+                      <div className="flex items-center gap-5">
+                        <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform">
+                          <FileText size={24} />
+                        </div>
+                        <div>
+                          <div className="font-bold text-slate-900 group-hover:text-blue-700 transition-colors">{file.name}</div>
+                          <div className="text-xs text-slate-500 uppercase font-bold mt-1 flex items-center gap-2">
+                            <span className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">PDF</span>
+                            {file.size}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="w-10 h-10 flex items-center justify-center text-slate-300 group-hover:text-blue-600 transition-colors">
+                        <Download size={24} />
+                      </div>
+                    </a>
+                  ))}
+                  <div className="text-center text-xs text-slate-400 mt-4">
+                    Zum Öffnen benötigen Sie einen PDF-Reader.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* KONTAKT & FOOTER */}
+          <section id="kontakt" className="relative bg-slate-900 text-slate-300 pt-24 pb-12 overflow-hidden">
+            {/* Footer Background Elements */}
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent"></div>
+            
+            <div className="container mx-auto px-4">
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
+                
+                {/* Brand Column */}
+                <div className="lg:col-span-1">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-900/50">
+                      <Car size={24} />
+                    </div>
+                    <div className="text-white">
+                      <div className="font-bold text-xl leading-none">{COMPANY.name}</div>
+                      <div className="text-[10px] uppercase tracking-widest text-blue-400 mt-1">Zulassungsdienst</div>
+                    </div>
+                  </div>
+                  <p className="text-sm leading-relaxed mb-6 opacity-80">
+                    Ihr zuverlässiger Partner für alles rund ums KFZ-Kennzeichen und Zulassungen in {COMPANY.address.city}. Schnell, kompetent, lokal.
+                  </p>
+                </div>
+
+                {/* Contact Info */}
+                <div className="lg:col-span-2 grid sm:grid-cols-2 gap-8">
+                  <div>
+                    <h4 className="font-bold mb-6 text-white flex items-center gap-2">
+                      <MapPin size={18} className="text-blue-500" />
+                      Anschrift
+                    </h4>
+                    <address className="not-italic text-sm space-y-2 opacity-80">
+                      <p className="font-semibold text-white">{COMPANY.name}</p>
+                      <p>{COMPANY.address.street}</p>
+                      <p>{COMPANY.address.zip} {COMPANY.address.city}</p>
+                      <a 
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${COMPANY.address.street}, ${COMPANY.address.zip} ${COMPANY.address.city}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 mt-2 text-xs font-bold uppercase tracking-wide"
+                      >
+                        Route planen <ArrowRight size={12} />
+                      </a>
+                    </address>
+                  </div>
+                  <div>
+                    <h4 className="font-bold mb-6 text-white flex items-center gap-2">
+                      <Phone size={18} className="text-blue-500" />
+                      Kontakt
+                    </h4>
+                    <ul className="space-y-4 text-sm">
+                      <li>
+                        <div className="text-xs text-slate-500 uppercase font-bold mb-1">Telefon</div>
+                        <a href={`tel:${COMPANY.contact.phone}`} className="text-white hover:text-blue-400 transition-colors text-lg font-medium block">
+                          {COMPANY.contact.phone}
+                        </a>
+                      </li>
+                      <li>
+                        <div className="text-xs text-slate-500 uppercase font-bold mb-1">Mobil / WhatsApp</div>
+                        <a href={`tel:${COMPANY.contact.mobile}`} className="text-white hover:text-blue-400 transition-colors block">
+                          {COMPANY.contact.mobile}
+                        </a>
+                      </li>
+                      <li>
+                        <div className="text-xs text-slate-500 uppercase font-bold mb-1">E-Mail</div>
+                        <a href={`mailto:${COMPANY.contact.email}`} className="text-white hover:text-blue-400 transition-colors block">
+                          {COMPANY.contact.email}
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Öffnungszeiten */}
+                <div>
+                  <h4 className="font-bold mb-6 text-white flex items-center gap-2">
+                    <Clock size={18} className="text-blue-500" />
+                    Öffnungszeiten
+                  </h4>
+                  <ul className="space-y-3 text-sm opacity-90">
+                    <li className="flex justify-between items-center border-b border-slate-800 pb-2">
+                      <span>Mo - Fr</span>
+                      <span className="text-white font-medium">08:00 - 17:00</span>
+                    </li>
+                    <li className="flex justify-between items-center border-b border-slate-800 pb-2">
+                      <span>Samstag</span>
+                      <span className="text-white font-medium">Nach Vereinbarung</span>
+                    </li>
+                    <li className="flex justify-between items-center pt-1">
+                      <span>Sonntag</span>
+                      <span className="text-red-400">Geschlossen</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Footer Bottom (FIX: Rechtssicherheit) */}
+              <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
+                <div>
+                  &copy; {new Date().getFullYear()} {COMPANY.name}. Alle Rechte vorbehalten.
+                </div>
+                <div className="flex gap-6">
+                  <button 
+                    onClick={() => setIsLegalOpen(true)} 
+                    className="hover:text-white transition-colors flex items-center gap-1"
+                  >
+                    <Info size={14} />
+                    Impressum & Datenschutz
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      );
+    }
+
+    // Render the app
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

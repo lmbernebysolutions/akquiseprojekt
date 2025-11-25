@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="de">
+<head><script>if(!sessionStorage.getItem("auth")){window.location.href="/"}</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entstaubungstechnik Schwarzenberg GmbH - Für saubere Luft</title>
+  <meta name="description" content="Ihr Experte für industrielle Entstaubungsanlagen. Von der Planung über die Fertigung bis zur Montage. Made in Germany.">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.c√om/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Babel Standalone for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <style>
+    /* Custom styles for animations */
+    @keyframes slide-in-from-left {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes slide-in-from-right {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes slide-in-from-top {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .animate-in {
+      animation-fill-mode: both;
+    }
+    
+    .slide-in-from-left {
+      animation: slide-in-from-left 0.7s ease-out;
+    }
+    
+    .slide-in-from-right {
+      animation: slide-in-from-right 1s ease-out;
+    }
+    
+    .slide-in-from-top-5 {
+      animation: slide-in-from-top 0.3s ease-out;
+    }
+    
+    .delay-200 {
+      animation-delay: 0.2s;
+    }
+    
+    .duration-700 {
+      animation-duration: 0.7s;
+    }
+    
+    .duration-1000 {
+      animation-duration: 1s;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    
+    // Icon Components (Lucide Icons as React Components)
+    const Icon = ({ children, size = 24, className = "", strokeWidth = 2, ...props }) => (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+        {...props}
+      >
+        {children}
+      </svg>
+    );
+    
+    const Wind = (props) => (
+      <Icon {...props}>
+        <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2" />
+        <path d="M9.6 4.6A2 2 0 1 1 11 8H2" />
+        <path d="M12.6 19.4A2 2 0 1 0 14 16H2" />
+      </Icon>
+    );
+    
+    const Menu = (props) => (
+      <Icon {...props}>
+        <line x1="4" x2="20" y1="12" y2="12" />
+        <line x1="4" x2="20" y1="6" y2="6" />
+        <line x1="4" x2="20" y1="18" y2="18" />
+      </Icon>
+    );
+    
+    const X = (props) => (
+      <Icon {...props}>
+        <line x1="18" x2="6" y1="6" y2="18" />
+        <line x1="6" x2="18" y1="6" y2="18" />
+      </Icon>
+    );
+    
+    const Phone = (props) => (
+      <Icon {...props}>
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+      </Icon>
+    );
+    
+    const Mail = (props) => (
+      <Icon {...props}>
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+        <polyline points="22,6 12,13 2,6" />
+      </Icon>
+    );
+    
+    const MapPin = (props) => (
+      <Icon {...props}>
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+        <circle cx="12" cy="10" r="3" />
+      </Icon>
+    );
+    
+    const ChevronRight = (props) => (
+      <Icon {...props}>
+        <polyline points="9 18 15 12 9 6" />
+      </Icon>
+    );
+    
+    const Settings = (props) => (
+      <Icon {...props}>
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+        <circle cx="12" cy="12" r="3" />
+      </Icon>
+    );
+    
+    const PenTool = (props) => (
+      <Icon {...props}>
+        <path d="M12 19l7-7 3 3-7 7-3-3z" />
+        <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+        <path d="M2 2l7.586 7.586" />
+        <circle cx="11" cy="11" r="2" />
+      </Icon>
+    );
+    
+    const Factory = (props) => (
+      <Icon {...props}>
+        <path d="M2 20h20" />
+        <path d="M5 20V8l5-5v5l5-5v12" />
+        <path d="M15 20v-8h5v8" />
+        <path d="M5 8h5" />
+        <path d="M10 8h5" />
+        <path d="M15 12h5" />
+        <path d="M15 16h5" />
+      </Icon>
+    );
+    
+    const Wrench = (props) => (
+      <Icon {...props}>
+        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+      </Icon>
+    );
+    
+    const Truck = (props) => (
+      <Icon {...props}>
+        <path d="M1 3h15v13H1z" />
+        <path d="M16 8h4l3 3v5h-7V8z" />
+        <circle cx="5.5" cy="18.5" r="2.5" />
+        <circle cx="18.5" cy="18.5" r="2.5" />
+      </Icon>
+    );
+    
+    const CheckCircle = (props) => (
+      <Icon {...props}>
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+        <polyline points="22 4 12 14.01 9 11.01" />
+      </Icon>
+    );
+    
+    const ArrowRight = (props) => (
+      <Icon {...props}>
+        <line x1="5" x2="19" y1="12" y2="12" />
+        <polyline points="12 5 19 12 12 19" />
+      </Icon>
+    );
+    
+    const Send = (props) => (
+      <Icon {...props}>
+        <line x1="22" x2="11" y1="2" y2="13" />
+        <polygon points="22 2 15 22 11 13 2 9 22 2" />
+      </Icon>
+    );
+
+    // --- Branding & Data Configuration ---
+    const BRAND = {
+      name: "Entstaubungstechnik Schwarzenberg GmbH",
+      shortName: "ETS GmbH",
+      slogan: "Für saubere Luft",
+      colors: {
+        primary: "bg-[#3b5f8f]", // Original ETS Blue kept for identity
+        primaryText: "text-[#3b5f8f]",
+        primaryHover: "hover:bg-[#2c4a70]",
+        accent: "bg-yellow-500", // Modernized Industrial Yellow (better contrast than original)
+        accentText: "text-yellow-600",
+        light: "bg-slate-50",
+      },
+      contact: {
+        phone: "+49 3774 / 123-456", 
+        email: "info@ets-schwarzenberg.de",
+        address: "Straße der Einheit 123, 08340 Schwarzenberg"
+      }
+    };
+
+    const SECTIONS = [
+      { id: 'home', label: 'Home' },
+      { id: 'about', label: 'Unternehmen' },
+      { id: 'services', label: 'Leistungen' },
+      { id: 'products', label: 'Produkte' },
+      { id: 'jobs', label: 'Karriere' }, // Critical Improvement: Elevated from "News"
+      { id: 'contact', label: 'Kontakt' },
+    ];
+
+    const JOBS = [
+      { title: "Schweißer WIG+MAG (m/w/d)", type: "Vollzeit", location: "Schwarzenberg" },
+      { title: "Anlagen-Monteur (m/w/d)", type: "Vollzeit", location: "Deutschlandweit" },
+      { title: "Elektriker (m/w/d)", type: "Vollzeit", location: "Schwarzenberg" },
+    ];
+
+    const PRODUCTS = [
+      "Gießereitechnik / Metallurgie",
+      "Rauchgasreinigung",
+      "Kremationstechnik",
+      "Steine / Erden / Baustoffe",
+      "Oberflächentechnik",
+      "Aufbereitung",
+      "Nichteisenmetallurgie",
+      "Chemische Industrie",
+      "Staubsauganlagen"
+    ];
+
+    // --- Components ---
+
+    const SectionHeading = ({ children, subtitle, align = "center" }) => (
+      <div className={`mb-12 ${align === "center" ? "text-center" : "text-left"}`}>
+        {subtitle && (
+          <span className={`uppercase tracking-widest text-sm font-bold ${BRAND.colors.accentText} mb-2 block`}>
+            {subtitle}
+          </span>
+        )}
+        <h2 className="text-3xl md:text-4xl font-bold text-slate-800 relative inline-block">
+          {children}
+          <span className={`absolute -bottom-4 ${align === "center" ? "left-1/2 -translate-x-1/2" : "left-0"} w-16 h-1 ${BRAND.colors.primary}`}></span>
+        </h2>
+      </div>
+    );
+
+    const ServiceCard = ({ icon: Icon, title, text }) => (
+      <div className="group bg-white p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 hover:-translate-y-1 h-full flex flex-col">
+        <div className={`w-14 h-14 rounded-lg ${BRAND.colors.primary} bg-opacity-10 flex items-center justify-center mb-6 group-hover:bg-opacity-100 transition-all shrink-0`}>
+          <Icon className={`w-8 h-8 ${BRAND.colors.primaryText} group-hover:text-white transition-colors`} />
+        </div>
+        <h3 className="text-xl font-bold text-slate-800 mb-3">{title}</h3>
+        <p className="text-slate-600 leading-relaxed text-sm flex-grow">{text}</p>
+      </div>
+    );
+
+    // --- Main Application ---
+
+    function ETSWebsite() {
+      const [isScrolled, setIsScrolled] = useState(false);
+      const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+      useEffect(() => {
+        const handleScroll = () => setIsScrolled(window.scrollY > 50);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+      }, []);
+
+      return (
+        <div className="font-sans text-slate-600 antialiased scroll-smooth bg-slate-50">
+          
+          {/* --- Top Bar (Trust & Contact) --- */}
+          <div className={`${BRAND.colors.primary} text-white py-2 text-xs md:text-sm`}>
+            <div className="container mx-auto px-4 flex justify-between items-center">
+              <div className="flex gap-4">
+                <a href={`tel:${BRAND.contact.phone}`} className="flex items-center gap-2 opacity-90 hover:opacity-100 hover:text-yellow-400 transition-colors" aria-label="Telefon anrufen">
+                  <Phone size={14} /> {BRAND.contact.phone}
+                </a>
+                <a href={`mailto:${BRAND.contact.email}`} className="hidden md:flex items-center gap-2 opacity-90 hover:opacity-100 hover:text-yellow-400 transition-colors" aria-label="E-Mail schreiben">
+                  <Mail size={14} /> {BRAND.contact.email}
+                </a>
+              </div>
+              <div className="font-bold tracking-wide opacity-90 flex items-center gap-2">
+                <span className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></span> Made in Germany
+              </div>
+            </div>
+          </div>
+
+          {/* --- Navigation --- */}
+          <header className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-2' : 'bg-white/95 backdrop-blur-sm py-4'}`}>
+            <div className="container mx-auto px-4 flex justify-between items-center">
+              {/* Logo Area */}
+              <a href="#home" className="flex items-center gap-3 group">
+                <div className={`${BRAND.colors.primary} text-white p-2 rounded font-bold text-2xl tracking-tighter group-hover:bg-[#2c4a70] transition-colors`}>
+                  ETS
+                </div>
+                <div className="leading-tight">
+                  <div className="font-bold text-slate-800 text-lg md:text-xl tracking-tight group-hover:text-[#3b5f8f] transition-colors">Entstaubungstechnik</div>
+                  <div className="text-xs md:text-sm text-slate-500 uppercase tracking-widest font-medium">Schwarzenberg GmbH</div>
+                </div>
+              </a>
+
+              {/* Desktop Nav */}
+              <nav className="hidden lg:flex items-center gap-8" role="navigation">
+                {SECTIONS.map((item) => (
+                  <a 
+                    key={item.id} 
+                    href={`#${item.id}`} 
+                    className="text-sm font-medium text-slate-600 hover:text-[#3b5f8f] transition-colors uppercase tracking-wide relative group"
+                  >
+                    {item.label}
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#3b5f8f] transition-all group-hover:w-full"></span>
+                  </a>
+                ))}
+                <a href="#contact" className={`${BRAND.colors.primary} ${BRAND.colors.primaryHover} text-white px-5 py-2 rounded-full text-sm font-bold transition-all shadow-lg shadow-blue-900/20 hover:shadow-blue-900/40 transform hover:-translate-y-0.5`}>
+                  Anfrage
+                </a>
+              </nav>
+
+              {/* Mobile Menu Button (A11y Improved) */}
+              <button 
+                className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded transition-colors"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label={isMobileMenuOpen ? "Menü schließen" : "Menü öffnen"}
+                aria-expanded={isMobileMenuOpen}
+              >
+                {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              </button>
+            </div>
+
+            {/* Mobile Nav Dropdown */}
+            {isMobileMenuOpen && (
+              <div className="lg:hidden absolute top-full left-0 w-full bg-white border-t border-slate-100 shadow-xl py-4 px-4 flex flex-col gap-2 animate-in slide-in-from-top-5">
+                {SECTIONS.map((item) => (
+                  <a 
+                    key={item.id} 
+                    href={`#${item.id}`}
+                    className="text-lg font-medium text-slate-700 py-3 px-4 hover:bg-slate-50 rounded border-b border-slate-50 last:border-0 flex justify-between items-center"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {item.label}
+                    <ChevronRight size={16} className="text-slate-300" />
+                  </a>
+                ))}
+                <a 
+                  href="#contact" 
+                  className={`mt-4 ${BRAND.colors.primary} text-white text-center py-3 rounded-lg font-bold shadow-md`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Jetzt anfragen
+                </a>
+              </div>
+            )}
+          </header>
+
+          {/* --- Hero Section --- */}
+          <section id="home" className="relative min-h-[85vh] flex items-center overflow-hidden bg-slate-900">
+            {/* Abstract Background representing Air/Structure */}
+            <div className="absolute inset-0 opacity-40 pointer-events-none">
+               <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-[#3b5f8f] to-slate-800"></div>
+               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-30"></div>
+            </div>
+            
+            {/* Dandelion Element (Abstract representation of "Pusteblume" from logo) */}
+            <div className="absolute right-[-10%] bottom-[-20%] opacity-10 text-white animate-pulse pointer-events-none">
+              <Wind size={600} strokeWidth={0.5} />
+            </div>
+
+            <div className="container mx-auto px-4 relative z-10 grid md:grid-cols-2 gap-12 items-center">
+              <div className="text-white space-y-8 animate-in slide-in-from-left duration-700">
+                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full border border-white/20 text-sm font-medium text-yellow-400">
+                  <CheckCircle size={16} className="text-yellow-400" /> Kompetenz seit Jahrzehnten
+                </div>
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300">Für saubere</span>
+                  <br />
+                  <span className="text-yellow-400 relative">
+                    Luft.
+                    <svg className="absolute w-full h-3 -bottom-1 left-0 text-yellow-500 opacity-60" viewBox="0 0 100 10" preserveAspectRatio="none">
+                      <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="none" />
+                    </svg>
+                  </span>
+                </h1>
+                <p className="text-lg text-slate-300 max-w-xl leading-relaxed">
+                  Ihr Experte für industrielle Entstaubungsanlagen. Von der Planung über die Fertigung bis zur Montage. 
+                  Anlagen mit dem Prädikat <span className="text-white font-semibold">"Made in Germany"</span>.
+                </p>
+                <div className="flex flex-wrap gap-4 pt-4">
+                  <a href="#products" className={`${BRAND.colors.accent} hover:bg-yellow-400 text-slate-900 px-8 py-4 rounded font-bold transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(234,179,8,0.3)] hover:shadow-[0_0_30px_rgba(234,179,8,0.5)] transform hover:-translate-y-1`}>
+                    Unsere Produkte <ArrowRight size={20} />
+                  </a>
+                  <a href="#about" className="bg-white/10 hover:bg-white/20 text-white border border-white/30 px-8 py-4 rounded font-bold transition-all backdrop-blur-sm flex items-center gap-2">
+                    Über uns
+                  </a>
+                </div>
+              </div>
+              {/* Decorative Hero Image Placeholder */}
+              <div className="hidden md:block relative animate-in slide-in-from-right duration-1000 delay-200">
+                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-transparent rounded-2xl transform rotate-3"></div>
+                 <div className="bg-slate-800 border border-slate-700 rounded-2xl p-2 shadow-2xl transform -rotate-3 hover:rotate-0 transition-all duration-500 group">
+                   <div className="bg-slate-900 rounded-xl h-[500px] flex items-center justify-center overflow-hidden relative">
+                      {/* Image Placeholder */}
+                      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-60 group-hover:scale-105 transition-transform duration-1000"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+                      
+                      <div className="absolute bottom-0 left-0 w-full p-8">
+                        <div className="bg-white/10 backdrop-blur p-4 rounded-lg border border-white/10">
+                          <p className="text-yellow-400 text-xs font-bold uppercase tracking-wider mb-1">Projektbeispiel</p>
+                          <p className="text-white font-medium">Industrielle Filteranlage (Rauchgasreinigung)</p>
+                        </div>
+                      </div>
+                   </div>
+                 </div>
+              </div>
+            </div>
+          </section>
+
+          {/* --- About / Philosophy Section --- */}
+          <section id="about" className="py-24 bg-white scroll-mt-20">
+            <div className="container mx-auto px-4">
+              <div className="grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                  <SectionHeading subtitle="Das Unternehmen" align="left">
+                    Tradition & Innovation
+                  </SectionHeading>
+                  <p className="text-slate-600 mb-6 leading-relaxed text-lg">
+                    Die <strong className="text-slate-900">ETS GmbH</strong> ist Hersteller und Errichter von industriellen Entstaubungsanlagen. Unsere Stärke liegt in der Anpassung der Anlagen an die individuellen Bedürfnisse unserer Kunden.
+                  </p>
+                  <p className="text-slate-600 mb-8 leading-relaxed">
+                    Dank unserer eigenen Konstruktions- und Fertigungsabteilung sind wir in der Lage, flexibel auf Wünsche einzugehen. Wir sind zertifiziert nach <strong>DIN EN ISO 9001:2008</strong> und <strong>DIN 1090-1 EXC3</strong> für Stahlbauten.
+                  </p>
+                  
+                  <div className="grid grid-cols-2 gap-6 mt-8">
+                    <div className="border-l-4 border-yellow-500 pl-6 py-2 bg-yellow-50/50">
+                      <div className="font-bold text-slate-900 text-2xl">100%</div>
+                      <div className="text-sm text-slate-600 font-medium">Made in Germany</div>
+                    </div>
+                    <div className="border-l-4 border-blue-800 pl-6 py-2 bg-blue-50/50">
+                      <div className="font-bold text-slate-900 text-2xl">ISO</div>
+                      <div className="text-sm text-slate-600 font-medium">Zertifiziert</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="absolute -inset-4 bg-slate-100 rounded-full opacity-50 blur-3xl"></div>
+                  <div className="grid grid-cols-2 gap-4 relative">
+                     <div className="bg-slate-50 p-8 rounded-2xl aspect-square flex flex-col justify-center items-center text-center shadow-sm hover:shadow-md transition-shadow group border border-slate-100">
+                        <div className="bg-blue-100 p-3 rounded-full mb-4 group-hover:bg-blue-200 transition-colors">
+                          <Settings size={32} className="text-blue-800" />
+                        </div>
+                        <span className="font-bold text-slate-800">Eigene Konstruktion</span>
+                     </div>
+                     <div className="bg-slate-50 p-8 rounded-2xl aspect-square flex flex-col justify-center items-center text-center mt-12 shadow-sm hover:shadow-md transition-shadow group border border-slate-100">
+                        <div className="bg-yellow-100 p-3 rounded-full mb-4 group-hover:bg-yellow-200 transition-colors">
+                          <Factory size={32} className="text-yellow-700" />
+                        </div>
+                        <span className="font-bold text-slate-800">Fertigung in Aue</span>
+                     </div>
+                     <div className="bg-slate-50 p-8 rounded-2xl aspect-square flex flex-col justify-center items-center text-center -mt-12 shadow-sm hover:shadow-md transition-shadow group border border-slate-100">
+                        <div className="bg-slate-200 p-3 rounded-full mb-4 group-hover:bg-slate-300 transition-colors">
+                          <Wrench size={32} className="text-slate-700" />
+                        </div>
+                        <span className="font-bold text-slate-800">Montage & Service</span>
+                     </div>
+                     <div className="bg-[#3b5f8f] p-8 rounded-2xl aspect-square flex flex-col justify-center items-center text-center shadow-lg hover:shadow-xl transition-shadow text-white relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/20"></div>
+                        <span className="font-bold text-4xl mb-1 relative z-10">ETS</span>
+                        <span className="text-xs opacity-80 uppercase tracking-widest relative z-10">Kompetenz</span>
+                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* --- Services Process Section (Unternehmensbereiche) --- */}
+          <section id="services" className="py-24 bg-slate-50 scroll-mt-20">
+            <div className="container mx-auto px-4">
+              <SectionHeading subtitle="Alles aus einer Hand">Unser Leistungsspektrum</SectionHeading>
+              
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+                <ServiceCard 
+                  icon={PenTool}
+                  title="Beratung & Planung"
+                  text="Unsere Vertriebsingenieure mit langjähriger Erfahrung beraten Sie für die beste Lösung. Modernste CAD-Arbeitsplätze in unserer Konstruktion sorgen für individuelle Anpassung."
+                />
+                <ServiceCard 
+                  icon={Factory}
+                  title="Fertigung"
+                  text="Im Stammhaus Schwarzenberg und in der Fertigung II Aue entstehen aus Grundmaterialien die einzelnen Anlagenkomponenten. Flexibilität ist unsere Stärke."
+                />
+                <ServiceCard 
+                  icon={Truck}
+                  title="Logistik & Montage"
+                  text="Transport mit eigener Flotte und Montage durch erfahrene eigene Teams. Wir garantieren Termintreue und Qualität auf der Baustelle."
+                />
+                <ServiceCard 
+                  icon={Settings}
+                  title="Service"
+                  text="Vom Probebetrieb über die Einweisung bis zur Wartung. Auch Oberflächenbehandlung von Stahlbau- und Maschinenteilen bieten wir an."
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* --- Products Section --- */}
+          <section id="products" className="py-24 bg-white scroll-mt-20">
+            <div className="container mx-auto px-4">
+              <SectionHeading subtitle="Industrielle Lösungen">Unsere Produkte</SectionHeading>
+              <p className="text-center text-slate-600 max-w-2xl mx-auto mb-16 text-lg">
+                Wir sind in allen Bereichen der Industrie zu Hause. Unsere Anlagen reinigen Luft, Rauch-, Transport- oder Prozessgase weltweit.
+              </p>
+
+              {/* Grid Layout replacement for Table */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-100 border border-slate-100 rounded-2xl overflow-hidden shadow-inner">
+                {PRODUCTS.map((product, index) => (
+                  <div key={index} className="bg-white p-8 hover:bg-blue-50 transition-colors group cursor-default flex flex-col justify-between min-h-[180px]">
+                    <div className="mb-4">
+                      <div className="w-8 h-1 bg-slate-200 rounded-full mb-4 group-hover:bg-yellow-500 group-hover:w-12 transition-all duration-300"></div>
+                      <h3 className="text-lg font-bold text-slate-800 group-hover:text-blue-800 transition-colors">{product}</h3>
+                    </div>
+                    <div className="flex justify-end opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-4 group-hover:translate-x-0 duration-300">
+                      <ArrowRight className="text-blue-800" size={20} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* --- Jobs / Career Section (Elevated from News) --- */}
+          <section id="jobs" className={`${BRAND.colors.primary} py-24 text-white relative overflow-hidden scroll-mt-20`}>
+            {/* Decorative background pattern */}
+            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '30px 30px'}}></div>
+            
+            <div className="container mx-auto px-4 relative z-10">
+              <div className="grid lg:grid-cols-2 gap-16">
+                <div>
+                  <span className="inline-block py-1 px-3 rounded bg-yellow-500 text-slate-900 font-bold text-xs uppercase tracking-wider mb-4">Wir stellen ein</span>
+                  <h2 className="text-3xl md:text-4xl font-bold mb-6">Werden Sie Teil des Teams</h2>
+                  <p className="text-blue-100 text-lg mb-8 leading-relaxed">
+                    Als mittelständisches Unternehmen bieten wir sichere Arbeitsplätze in der Region mit spannenden Aufgaben im weltweiten Anlagenbau. 
+                    Wir suchen Verstärkung!
+                  </p>
+                  <div className="bg-white/10 backdrop-blur rounded-xl p-8 border border-white/20 inline-block w-full sm:w-auto">
+                    <p className="font-bold mb-2 text-xl">Initiativbewerbung?</p>
+                    <p className="text-sm text-blue-100 mb-6">Senden Sie Ihre Unterlagen direkt an uns.</p>
+                    <a href={`mailto:${BRAND.contact.email}`} className="inline-flex items-center gap-2 bg-yellow-500 hover:bg-yellow-400 text-slate-900 px-6 py-3 rounded-lg font-bold transition-colors w-full justify-center sm:w-auto">
+                      <Mail size={18} /> Bewerbung senden
+                    </a>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {JOBS.map((job, idx) => (
+                    <div key={idx} className="bg-white text-slate-800 p-6 rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300 flex justify-between items-center group cursor-pointer">
+                      <div>
+                        <h3 className="font-bold text-lg group-hover:text-blue-800 transition-colors">{job.title}</h3>
+                        <div className="flex flex-col sm:flex-row sm:gap-4 text-sm text-slate-500 mt-2">
+                          <span className="flex items-center gap-1"><MapPin size={14} /> {job.location}</span>
+                          <span className="flex items-center gap-1"><CheckCircle size={14} /> {job.type}</span>
+                        </div>
+                      </div>
+                      <div className="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center group-hover:bg-yellow-400 transition-colors shrink-0 ml-4">
+                        <ChevronRight size={20} className="text-slate-600 group-hover:text-white" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* --- Contact / Footer (Improved Form UI) --- */}
+          <footer id="contact" className="bg-slate-900 text-slate-400 pt-24 pb-12 border-t border-slate-800 scroll-mt-20">
+            <div className="container mx-auto px-4">
+              <div className="grid lg:grid-cols-2 gap-16 mb-20">
+                {/* Left: Info */}
+                <div>
+                  <div className="text-white font-bold text-3xl mb-6 tracking-tight">ETS GmbH</div>
+                  <p className="mb-8 leading-relaxed text-lg">
+                    Ihr Partner für saubere Luft. Hersteller und Errichter von industriellen Entstaubungsanlagen mit Sitz in Schwarzenberg.
+                  </p>
+                  
+                  <h4 className="text-white font-bold text-lg mb-6">Kontaktinformationen</h4>
+                  <ul className="space-y-6">
+                    <li className="flex items-start gap-4 group">
+                      <div className="bg-slate-800 p-3 rounded-lg group-hover:bg-yellow-500 group-hover:text-slate-900 transition-colors">
+                        <MapPin size={20} />
+                      </div>
+                      <div>
+                        <span className="block text-white font-medium">Anschrift</span>
+                        <span>{BRAND.contact.address}</span>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-4 group">
+                      <div className="bg-slate-800 p-3 rounded-lg group-hover:bg-yellow-500 group-hover:text-slate-900 transition-colors">
+                        <Phone size={20} />
+                      </div>
+                      <div>
+                        <span className="block text-white font-medium">Telefon</span>
+                        <a href={`tel:${BRAND.contact.phone}`} className="hover:text-white transition-colors">{BRAND.contact.phone}</a>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-4 group">
+                      <div className="bg-slate-800 p-3 rounded-lg group-hover:bg-yellow-500 group-hover:text-slate-900 transition-colors">
+                        <Mail size={20} />
+                      </div>
+                      <div>
+                        <span className="block text-white font-medium">E-Mail</span>
+                        <a href={`mailto:${BRAND.contact.email}`} className="hover:text-white transition-colors">{BRAND.contact.email}</a>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Right: Contact Form UI */}
+                <div className="bg-slate-800 p-8 rounded-2xl border border-slate-700">
+                  <h3 className="text-white font-bold text-xl mb-6">Kontakt aufnehmen</h3>
+                  <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-300">Vorname</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors" placeholder="Max" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-300">Nachname</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors" placeholder="Mustermann" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-300">E-Mail</label>
+                      <input type="email" className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors" placeholder="max@beispiel.de" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-300">Nachricht</label>
+                      <textarea rows="4" className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors" placeholder="Wie können wir Ihnen helfen?"></textarea>
+                    </div>
+                    <button className="w-full bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2">
+                      <Send size={18} /> Nachricht senden
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
+                <p>&copy; {new Date().getFullYear()} {BRAND.name}. Alle Rechte vorbehalten.</p>
+                <ul className="flex gap-6">
+                  <li><a href="#" className="hover:text-white transition-colors">Impressum</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Datenschutz</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">AGB</a></li>
+                </ul>
+              </div>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    // Render the app
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<ETSWebsite />);
+  </script>
+</body>
+</html>

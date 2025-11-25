@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+<head><script>if(!sessionStorage.getItem("auth")){window.location.href="/"}</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Partyservice Piep Piep Piep - Ihr Partner für unvergessliche Feiern in Aue und Umgebung. Buffets, Menüs und Komplettpakete.">
+    <title>Partyservice Piep Piep Piep | Catering in Aue</title>
+    
+    <!-- Fonts: Playfair Display (Elegant) & Inter (Modern) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#cc1512',      
+                            redLight: '#e02e2b', /* IMPROVEMENT 4: Helleres Rot für bessere Lesbarkeit auf Dunkel */
+                            redHover: '#a8100e',
+                            dark: '#0f0f0f',     /* IMPROVEMENT 1: Tieferes Schwarz für OLED Screens */
+                            surface: '#18181b',  /* Zink-Tone statt reinem Grau für edleren Look */
+                            surfaceHighlight: '#27272a',
+                            text: '#f3f3f3',     
+                            muted: '#a1a1aa'     
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(204, 21, 18, 0.15)', /* IMPROVEMENT 1: Farbiger Glow statt schwarzer Schatten */
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f0f0f; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #cc1512; }
+        
+        .hero-overlay {
+            background: linear-gradient(to bottom, rgba(15,15,15,0.4) 0%, rgba(15,15,15,0.7) 60%, rgba(15,15,15,1) 100%);
+        }
+        
+        /* IMPROVEMENT 3: Text Clamp für Bento Grid Sicherheit */
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-brand-dark text-brand-text font-sans antialiased selection:bg-brand-red selection:text-white">
+
+    <!-- Navigation (Sticky Header with Backdrop Blur) -->
+    <header x-data="{ mobileMenuOpen: false, scrolled: false }" 
+            @scroll.window="scrolled = (window.pageYOffset > 20)"
+            :class="{ 'bg-brand-dark/80 shadow-lg backdrop-blur-lg py-3 border-b border-white/5': scrolled, 'bg-transparent py-6 border-transparent': !scrolled }"
+            class="fixed top-0 w-full z-50 transition-all duration-500">
+        <div class="container mx-auto px-4 md:px-6">
+            <div class="flex justify-between items-center">
+                <a href="#" class="group relative z-50">
+                    <h1 class="font-serif text-2xl md:text-3xl font-bold tracking-wide text-white">
+                        Partyservice <span class="text-brand-red transition-colors duration-300 group-hover:text-brand-redLight">Piep</span>
+                    </h1>
+                </a>
+
+                <!-- Desktop Menu -->
+                <nav class="hidden md:flex space-x-8 items-center">
+                    <!-- IMPROVEMENT 5: Hover-Effekte mit Unterstrich-Animation -->
+                    <a href="#home" class="text-sm font-medium text-gray-300 hover:text-white transition-colors relative group">
+                        Startseite
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-red transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#services" class="text-sm font-medium text-gray-300 hover:text-white transition-colors relative group">
+                        Services
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-red transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#pakete" class="text-sm font-medium text-gray-300 hover:text-white transition-colors relative group">
+                        Pakete
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-red transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#about" class="text-sm font-medium text-gray-300 hover:text-white transition-colors relative group">
+                        Über uns
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-red transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <!-- IMPROVEMENT 5: Active Scale Effect -->
+                    <a href="#kontakt" class="bg-brand-red hover:bg-brand-redHover text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all transform hover:shadow-glow active:scale-95">
+                        Kontakt
+                    </a>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden text-2xl focus:outline-none z-50 relative text-white" aria-label="Menü öffnen">
+                    <i :class="mobileMenuOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Overlay (Improved with Backdrop Blur) -->
+        <div x-show="mobileMenuOpen" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-40 bg-brand-dark/95 backdrop-blur-xl md:hidden flex items-center justify-center">
+            <nav class="flex flex-col space-y-8 text-center">
+                <a href="#home" @click="mobileMenuOpen = false" class="text-2xl font-serif hover:text-brand-red transition-colors">Startseite</a>
+                <a href="#services" @click="mobileMenuOpen = false" class="text-2xl font-serif hover:text-brand-red transition-colors">Services</a>
+                <a href="#pakete" @click="mobileMenuOpen = false" class="text-2xl font-serif hover:text-brand-red transition-colors">Pakete</a>
+                <a href="#about" @click="mobileMenuOpen = false" class="text-2xl font-serif hover:text-brand-red transition-colors">Über uns</a>
+                <a href="#kontakt" @click="mobileMenuOpen = false" class="text-2xl font-bold text-brand-red mt-4">Kontakt aufnehmen</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section (IMPROVEMENT 2: h-dvh fix) -->
+    <section id="home" class="relative h-[100dvh] min-h-[600px] flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1555244162-803834f70033?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" 
+                 alt="Exklusives Buffet Catering" 
+                 class="w-full h-full object-cover object-center scale-105 animate-[pulse_10s_ease-in-out_infinite_alternate]" 
+                 style="animation-duration: 25s;">
+        </div>
+        <div class="absolute inset-0 hero-overlay z-10"></div>
+
+        <div class="container mx-auto px-4 relative z-20 text-center pt-20">
+            <div class="block mx-auto w-fit py-1.5 px-4 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-gray-200 text-xs font-bold tracking-widest uppercase mb-8 animate-fade-in-up">
+                <span class="text-brand-red mr-2">●</span> Seit Jahren bewährte Qualität
+            </div>
+            <h2 class="font-serif text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight tracking-tight drop-shadow-lg">
+                Ein Platz zum <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-brand-redLight">Feiern</span>.
+            </h2>
+            <p class="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-md">
+                Wir bieten für jeden Anlass das passende Buffet. Hausgemacht, frisch und mit Leidenschaft für Aue und Umgebung.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#kontakt" class="bg-brand-red hover:bg-brand-redHover text-white px-8 py-4 rounded-full font-semibold text-lg transition-all transform hover:-translate-y-1 shadow-glow active:scale-95">
+                    Jetzt anfragen
+                </a>
+                <a href="#services" class="bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 hover:border-white/30 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all active:scale-95">
+                    Unsere Services
+                </a>
+            </div>
+        </div>
+        
+        <a href="#about" class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 text-white/50 hover:text-white transition-colors cursor-pointer p-4" aria-label="Nach unten scrollen">
+            <i class="fa-solid fa-arrow-down text-xl animate-bounce"></i>
+        </a>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-24 bg-brand-dark relative overflow-hidden">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div class="relative group">
+                    <!-- IMPROVEMENT 1: Subtile Border statt nur Schatten -->
+                    <div class="absolute -top-4 -left-4 w-24 h-24 border-t border-l border-brand-red/50 opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="absolute -bottom-4 -right-4 w-24 h-24 border-b border-r border-brand-red/50 opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    <div class="bg-brand-surface rounded-lg w-full h-[500px] overflow-hidden border border-white/5 relative">
+                        <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                             alt="Elegantes Buffet Setup" 
+                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                             onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'flex items-center justify-center h-full text-gray-500\'><i class=\'fa-solid fa-image text-4xl\'></i></div>'">
+                        <!-- Overlay for better text contrast if needed -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60"></div>
+                    </div>
+                </div>
+                
+                <div class="space-y-8">
+                    <h3 class="font-serif text-3xl md:text-5xl font-bold text-white leading-tight">
+                        Ihr Partner für <br><span class="text-brand-red">unvergessliche Momente</span>
+                    </h3>
+                    <div class="w-24 h-1 bg-gradient-to-r from-brand-red to-transparent rounded-full"></div>
+                    
+                    <div class="space-y-6 text-gray-400 leading-relaxed text-lg">
+                        <p>
+                            Ob Firmenfeste, Hochzeiten, Geburtstage oder sonstige Events – wir machen Ihre Veranstaltung in Aue und Umgebung zum Erlebnis. Ihre Wünsche als Kunde stehen dabei immer im Vordergrund.
+                        </p>
+                        <p>
+                            Unsere langjährig erfahrene Mannschaft garantiert für eine hohe Qualität der Produkte sowie für eine perfekte optische Präsentation. <strong class="text-gray-200 font-semibold">Alle unsere Speisen sind hausgemacht</strong> und werden für Ihr Fest frisch hergestellt.
+                        </p>
+                    </div>
+                    
+                    <ul class="space-y-4 mt-4">
+                        <li class="flex items-center text-gray-300">
+                            <div class="w-8 h-8 rounded-full bg-brand-red/10 flex items-center justify-center mr-4 border border-brand-red/20">
+                                <i class="fa-solid fa-check text-brand-red text-sm"></i>
+                            </div>
+                            Individuelle Beratung vor Ort
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <div class="w-8 h-8 rounded-full bg-brand-red/10 flex items-center justify-center mr-4 border border-brand-red/20">
+                                <i class="fa-solid fa-check text-brand-red text-sm"></i>
+                            </div>
+                            Probeessen einzelner Speisen möglich
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services (IMPROVEMENT 1: Borders for Depth) -->
+    <section id="services" class="py-24 bg-brand-surface border-t border-white/5 relative">
+        <!-- Background Pattern -->
+        <div class="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 30px 30px;"></div>
+
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="text-center max-w-3xl mx-auto mb-20">
+                <span class="text-brand-red text-sm font-bold tracking-widest uppercase mb-2 block">Was wir bieten</span>
+                <h2 class="font-serif text-3xl md:text-5xl font-bold text-white mb-6">Unser kulinarisches Angebot</h2>
+                <p class="text-gray-400 text-lg">Von der kleinen Familienfeier bis zum großen Firmenevent.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Service Card 1 -->
+                <div class="group bg-brand-gray p-10 rounded-2xl border border-white/5 hover:border-brand-red/40 transition-all duration-300 hover:-translate-y-2 hover:shadow-glow hover:bg-brand-surfaceHighlight">
+                    <div class="w-16 h-16 bg-brand-surface rounded-2xl border border-white/10 flex items-center justify-center mb-8 group-hover:border-brand-red/50 transition-colors shadow-lg">
+                        <i class="fa-solid fa-utensils text-brand-red text-2xl"></i>
+                    </div>
+                    <h3 class="font-serif text-2xl font-bold mb-4 text-white">Buffet & Menü</h3>
+                    <p class="text-gray-400 leading-relaxed mb-8">
+                        Wir bieten für jeden Anlass und Geschmack das passende Buffet oder ofenfrische Menü. Frisch zubereitet und heiß geliefert.
+                    </p>
+                    <a href="#kontakt" class="inline-flex items-center text-sm font-bold text-brand-redLight hover:text-white transition-colors group/link">
+                        Anfrage stellen <i class="fa-solid fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+
+                <!-- Service Card 2 -->
+                <div class="group bg-brand-gray p-10 rounded-2xl border border-white/5 hover:border-brand-red/40 transition-all duration-300 hover:-translate-y-2 hover:shadow-glow hover:bg-brand-surfaceHighlight">
+                    <div class="w-16 h-16 bg-brand-surface rounded-2xl border border-white/10 flex items-center justify-center mb-8 group-hover:border-brand-red/50 transition-colors shadow-lg">
+                        <i class="fa-solid fa-champagne-glasses text-brand-red text-2xl"></i>
+                    </div>
+                    <h3 class="font-serif text-2xl font-bold mb-4 text-white">Eventplanung</h3>
+                    <p class="text-gray-400 leading-relaxed mb-8">
+                        Wir kümmern uns nicht nur um die Ausrichtung des Essens, sondern auch um Gestaltung, Ausstattung und Unterhaltung.
+                    </p>
+                    <a href="#kontakt" class="inline-flex items-center text-sm font-bold text-brand-redLight hover:text-white transition-colors group/link">
+                        Mehr erfahren <i class="fa-solid fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+
+                <!-- Service Card 3 -->
+                <div class="group bg-brand-gray p-10 rounded-2xl border border-white/5 hover:border-brand-red/40 transition-all duration-300 hover:-translate-y-2 hover:shadow-glow hover:bg-brand-surfaceHighlight">
+                    <div class="w-16 h-16 bg-brand-surface rounded-2xl border border-white/10 flex items-center justify-center mb-8 group-hover:border-brand-red/50 transition-colors shadow-lg">
+                        <i class="fa-solid fa-truck-fast text-brand-red text-2xl"></i>
+                    </div>
+                    <h3 class="font-serif text-2xl font-bold mb-4 text-white">Lieferservice</h3>
+                    <p class="text-gray-400 leading-relaxed mb-8">
+                        Pünktliche Lieferung direkt zu Ihrem Veranstaltungsort in Aue und der gesamten Umgebung. Zuverlässig und frisch.
+                    </p>
+                    <a href="#kontakt" class="inline-flex items-center text-sm font-bold text-brand-redLight hover:text-white transition-colors group/link">
+                        Liefergebiet prüfen <i class="fa-solid fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Packages (IMPROVEMENT 3: Fixed Bento Grid Height Logic) -->
+    <section id="pakete" class="py-24 bg-brand-dark border-t border-white/5">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+                <div>
+                    <h2 class="font-serif text-3xl md:text-4xl font-bold mb-3 text-white">Kreative Komplettpakete</h2>
+                    <p class="text-gray-400">So wird Ihre Feier zum ganz besonderen Ereignis.</p>
+                </div>
+                <a href="#kontakt" class="hidden md:inline-flex items-center text-white hover:text-brand-red transition-colors group">
+                    Alle Pakete ansehen <i class="fa-solid fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+
+            <!-- Grid layout without fixed heights that might break -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Large Feature Item -->
+                <div class="md:col-span-2 md:row-span-2 min-h-[350px] md:min-h-[450px] relative group overflow-hidden rounded-2xl cursor-pointer border border-white/5 hover:border-brand-red/30 transition-colors">
+                    <img src="https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Gala Dinner">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent p-8 flex flex-col justify-end">
+                        <span class="text-brand-red font-bold text-xs uppercase tracking-widest mb-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">Bestseller</span>
+                        <h3 class="font-serif text-3xl font-bold text-white mb-2">Das Hochzeits-Spezial</h3>
+                        <p class="text-gray-300 text-sm md:text-base line-clamp-3">Komplettes Menü inkl. Sektempfang, Hauptgang-Buffet und rustikalem Mitternachtssnack. Alles inklusive Service.</p>
+                    </div>
+                </div>
+
+                <!-- Medium Item -->
+                <div class="md:col-span-2 min-h-[220px] relative group overflow-hidden rounded-2xl cursor-pointer border border-white/5 hover:border-brand-red/30 transition-colors">
+                    <img src="https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Pizza Buffet">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-8 flex flex-col justify-end">
+                        <h3 class="font-serif text-xl font-bold text-white mb-1">Das Italienische Buffet</h3>
+                        <p class="text-gray-300 text-sm">Antipasti, Pasta & Tiramisu.</p>
+                    </div>
+                </div>
+
+                <!-- Small Item 1 -->
+                <div class="relative group overflow-hidden rounded-2xl cursor-pointer bg-brand-surface border border-white/5 p-8 flex flex-col justify-center items-center text-center hover:border-brand-red/50 hover:bg-brand-surfaceHighlight transition-all duration-300 min-h-[200px]">
+                    <div class="w-12 h-12 rounded-full bg-brand-dark flex items-center justify-center mb-4 border border-white/5 group-hover:border-brand-red/30 transition-colors">
+                        <i class="fa-solid fa-cake-candles text-2xl text-brand-red"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-lg">Geburtstage</h3>
+                    <span class="text-xs text-brand-muted mt-2">Ab 20 Personen</span>
+                </div>
+
+                <!-- Small Item 2 -->
+                <div class="relative group overflow-hidden rounded-2xl cursor-pointer bg-brand-surface border border-white/5 p-8 flex flex-col justify-center items-center text-center hover:border-brand-red/50 hover:bg-brand-surfaceHighlight transition-all duration-300 min-h-[200px]">
+                    <div class="w-12 h-12 rounded-full bg-brand-dark flex items-center justify-center mb-4 border border-white/5 group-hover:border-brand-red/30 transition-colors">
+                        <i class="fa-solid fa-building text-2xl text-brand-red"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-lg">Firmenfeiern</h3>
+                    <span class="text-xs text-brand-muted mt-2">Full Service</span>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center md:hidden">
+                <a href="#kontakt" class="inline-block text-white border-b border-brand-red pb-1 hover:text-brand-red transition-colors">
+                    Alle Pakete ansehen
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact & Footer -->
+    <section id="kontakt" class="bg-brand-surface border-t border-white/5">
+        <div class="container mx-auto px-4 py-24">
+            <div class="grid md:grid-cols-2 gap-16 lg:gap-24">
+                <!-- Contact Form Info -->
+                <div>
+                    <span class="text-brand-red font-bold text-sm uppercase tracking-widest mb-2 block">Wir sind für Sie da</span>
+                    <h2 class="font-serif text-3xl md:text-5xl font-bold mb-8 text-white">Kontakt aufnehmen</h2>
+                    <p class="text-gray-400 mb-10 leading-relaxed text-lg">
+                        Wir beraten Sie gerne persönlich und auch vor Ort. Rufen Sie uns an oder schreiben Sie uns. Wir erstellen Ihnen ein unverbindliches Angebot für Ihre Feier.
+                    </p>
+
+                    <div class="space-y-8">
+                        <div class="flex items-center p-4 rounded-xl hover:bg-brand-dark/50 transition-colors border border-transparent hover:border-white/5">
+                            <div class="w-14 h-14 rounded-full bg-brand-dark flex items-center justify-center text-brand-red flex-shrink-0 border border-white/5">
+                                <i class="fa-solid fa-phone text-xl"></i>
+                            </div>
+                            <div class="ml-6">
+                                <p class="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">Telefon</p>
+                                <a href="tel:+4937714500911" class="text-2xl font-bold text-white hover:text-brand-red transition-colors">+49 3771 4500911</a>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center p-4 rounded-xl hover:bg-brand-dark/50 transition-colors border border-transparent hover:border-white/5">
+                            <div class="w-14 h-14 rounded-full bg-brand-dark flex items-center justify-center text-brand-red flex-shrink-0 border border-white/5">
+                                <i class="fa-solid fa-location-dot text-xl"></i>
+                            </div>
+                            <div class="ml-6">
+                                <p class="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">Adresse</p>
+                                <p class="text-lg text-white font-medium">Alfred Brodauf Strasse 32</p>
+                                <p class="text-gray-400">08280 Aue</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Card / Map Placeholder -->
+                <div class="bg-brand-dark p-10 rounded-3xl border border-white/5 shadow-2xl relative overflow-hidden">
+                    <!-- Decorative blur -->
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-brand-red/5 rounded-full blur-3xl"></div>
+                    
+                    <h3 class="font-serif text-2xl font-bold mb-8 text-white border-b border-white/5 pb-4">Öffnungszeiten</h3>
+                    <div class="space-y-5 text-sm md:text-base">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400 font-medium">Montag - Freitag</span>
+                            <span class="text-white font-bold bg-brand-surface px-3 py-1 rounded-md border border-white/5">Nach Vereinbarung</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400 font-medium">Samstag</span>
+                            <span class="text-brand-red font-bold bg-brand-red/10 px-3 py-1 rounded-md border border-brand-red/20">Für Events geöffnet</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400 font-medium">Sonntag</span>
+                            <span class="text-brand-red font-bold bg-brand-red/10 px-3 py-1 rounded-md border border-brand-red/20">Für Events geöffnet</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-10">
+                        <!-- Visual Map Placeholder -->
+                        <div class="w-full h-56 bg-brand-surface rounded-xl flex items-center justify-center relative overflow-hidden group cursor-pointer border border-white/5 hover:border-brand-red/30 transition-all">
+                            <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                                 class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-50 transition-opacity duration-500 grayscale group-hover:grayscale-0" 
+                                 alt="Karte">
+                            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-brand-dark/80"></div>
+                            <button class="relative z-10 bg-brand-red hover:bg-brand-redHover text-white px-6 py-3 rounded-full shadow-lg text-sm font-bold transition-transform transform group-hover:-translate-y-1 active:scale-95 flex items-center">
+                                <i class="fa-solid fa-map-pin mr-2"></i> Route planen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="border-t border-white/5 bg-black/40 backdrop-blur-sm">
+            <div class="container mx-auto px-4 py-10 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
+                <p class="mb-4 md:mb-0">&copy; 2025 Partyservice Piep Piep Piep. Alle Rechte vorbehalten.</p>
+                <div class="flex space-x-8">
+                    <a href="#" class="hover:text-brand-red transition-colors">Impressum</a>
+                    <a href="#" class="hover:text-brand-red transition-colors">Datenschutz</a>
+                    <a href="#" class="hover:text-brand-red transition-colors">Login</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Simple smooth scroll behavior for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
