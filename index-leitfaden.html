@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+<head>
+    <script>if(!sessionStorage.getItem("auth")){window.location.href="/"}</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leitfaden Selbstständigkeit - WBL Projekt</title>
+    <meta name="description" content="Interaktiver Leitfaden für Existenzgründer. Von der Idee bis zur Gründung.">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel Standalone -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="font-sans text-slate-600 bg-slate-50 selection:bg-amber-100 selection:text-amber-900">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- ICON COMPONENTS (Replaced lucide-react imports with inline SVGs) ---
+        const IconBase = ({ children, size = 24, className = "", ...props }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+                {children}
+            </svg>
+        );
+
+        const Briefcase = (props) => <IconBase {...props}><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></IconBase>;
+        const Building2 = (props) => <IconBase {...props}><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></IconBase>;
+        const Calculator = (props) => <IconBase {...props}><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></IconBase>;
+        const Calendar = (props) => <IconBase {...props}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></IconBase>;
+        const CheckCircle2 = (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></IconBase>;
+        const ChevronDown = (props) => <IconBase {...props}><path d="m6 9 6 6 6-6"/></IconBase>;
+        const ChevronRight = (props) => <IconBase {...props}><path d="m9 18 6-6-6-6"/></IconBase>;
+        const Coins = (props) => <IconBase {...props}><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></IconBase>;
+        const Compass = (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></IconBase>;
+        const FileText = (props) => <IconBase {...props}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></IconBase>;
+        const Landmark = (props) => <IconBase {...props}><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></IconBase>;
+        const Lightbulb = (props) => <IconBase {...props}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></IconBase>;
+        const Menu = (props) => <IconBase {...props}><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></IconBase>;
+        const ShieldCheck = (props) => <IconBase {...props}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></IconBase>;
+        const Users = (props) => <IconBase {...props}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></IconBase>;
+        const X = (props) => <IconBase {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></IconBase>;
+        const ScaleIcon = (props) => <IconBase {...props}><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></IconBase>;
+
+
+        // --- DATA & CONTENT ---
+        const timelineData = [
+          {
+            step: 1,
+            title: "Geschäftsidee & Analyse",
+            desc: "Was kannst du gut? Was motiviert dich? Wofür zahlen Kunden? Die Basis jeder Gründung.",
+            source: "DWzS",
+            icon: Lightbulb
+          },
+          {
+            step: 2,
+            title: "Businessplan",
+            desc: "Strukturierung des Konzepts für Investoren und eigene Klarheit. (Details siehe unten)",
+            source: "BP",
+            icon: FileText
+          },
+          {
+            step: 3,
+            title: "Genehmigungen & Rechtsform",
+            desc: "Prüfung: Meisterbrief nötig? Gesundheitszeugnis? Wahl der Rechtsform (Einzel vs. Kapital).",
+            source: "RF",
+            icon: ScaleIcon
+          },
+          {
+            step: 4,
+            title: "Identität & Branding",
+            desc: "Namensfindung und Logo-Entwicklung. Alleinstellungsmerkmal definieren.",
+            source: "DWzS",
+            icon: Compass
+          },
+          {
+            step: 5,
+            title: "Gewerbeanmeldung",
+            desc: "Der offizielle Akt: Gewerbeamt besuchen & Fragebogen zur steuerlichen Erfassung (Finanzamt).",
+            source: "DWzS",
+            icon: Building2,
+            highlight: true
+          },
+          {
+            step: 6,
+            title: "Operativer Start",
+            desc: "Geschäftskonto, Versicherungen, Marketing und erste Rechnungen.",
+            source: "WBL",
+            icon: CheckCircle2
+          }
+        ];
+
+        const legalFormsData = [
+          {
+            type: "Einzelunternehmen",
+            icon: Users,
+            desc: "Häufigste Form. Einfacher Start, volle Haftung.",
+            pros: ["Kein Mindestkapital", "Einfache Gründung", "Volle Kontrolle"],
+            cons: ["Unbeschränkte Haftung (Privatvermögen)", "Alleiniges Risiko"],
+            examples: ["Freiberufler", "Kleingewerbe", "e.K."],
+            source: "RF"
+          },
+          {
+            type: "Personengesellschaften",
+            icon: Users,
+            desc: "Zusammenschluss von mind. 2 Personen.",
+            pros: ["Geteilte Verantwortung", "Kein Mindestkapital (GbR)"],
+            cons: ["Meist volle persönliche Haftung", "Konfliktpotenzial"],
+            examples: ["GbR", "OHG", "KG"],
+            source: "RF"
+          },
+          {
+            type: "Kapitalgesellschaften",
+            icon: Building2,
+            desc: "Juristische Person. Haftungsbeschränkung.",
+            pros: ["Haftung auf Einlage beschränkt", "Hohes Ansehen"],
+            cons: ["Hohes Stammkapital (GmbH 25k€)", "Bilanzierungspflicht", "Notarpflicht"],
+            examples: ["GmbH", "UG (haftungsbeschränkt)", "AG"],
+            source: "RF"
+          }
+        ];
+
+        const businessPlanChapters = [
+          { title: "1. Executive Summary", content: "Der Pitch: Kompakter Überblick über Idee, Markt und Finanzierung. Muss sitzen!", source: "BP" },
+          { title: "2. Geschäftsidee / Produkt", content: "Detaillierte Problemlösung. Was ist der USP (Alleinstellungsmerkmal)?", source: "BP" },
+          { title: "3. Markt & Wettbewerb", content: "Marktgröße, Zielgruppenanalyse und Konkurrenzbeobachtung.", source: "BP" },
+          { title: "4. Marketing & Vertrieb", content: "STP-Strategie (Segmentierung, Targeting, Positionierung) und die 4Ps.", source: "BP" },
+          { title: "5. Unternehmensorganisation", content: "Rechtsform, Team, Rollenverteilung, Standort.", source: "BP" },
+          { title: "6. SWOT-Analyse", content: "Realistische Einschätzung von Chancen & Risiken. Strategien zur Risikominimierung.", source: "BP" },
+          { title: "7. Finanzplan", content: "Herzstück für Banken: Kapitalbedarf, Liquiditätsplan, GuV, Bilanz.", source: "BP" },
+          { title: "8. Unterlagen", content: "Lebenslauf, Verträge, Genehmigungen als Anhang.", source: "BP" }
+        ];
+
+        const taxesData = [
+          { name: "Einkommensteuer", rate: "14% - 45%", info: "Auf den Gewinn. Progressiver Tarif. Freibetrag: 11.604€ (2024).", deadlines: ["10.03.", "10.06.", "10.09.", "10.12."], type: "Vorauszahlung" },
+          { name: "Umsatzsteuer", rate: "7% / 19%", info: "Durchlaufposten. Vorsteuerabzug möglich. Ausnahme: Kleinunternehmer.", deadlines: ["Monatlich", "Vierteljährlich"], type: "Laufend" },
+          { name: "Gewerbesteuer", rate: "3,5% x Hebesatz", info: "Gemeindesteuer. Freibetrag 24.500€ (für Einzeluntern.).", deadlines: ["15.02.", "15.05.", "15.08.", "15.11."], type: "Vorauszahlung" },
+          { name: "Körperschaftssteuer", rate: "15%", info: "Nur für Kapitalgesellschaften (GmbH, UG, AG). Zzgl. Soli.", deadlines: [], type: "Jahresabschluss" }
+        ];
+
+        // --- UI COMPONENTS ---
+
+        const SectionTitle = ({ subtitle, title, dark = false }) => (
+          <div className="mb-12 text-center max-w-3xl mx-auto">
+            <span className={`uppercase tracking-widest text-xs font-bold ${dark ? 'text-amber-400' : 'text-blue-600'} mb-2 block`}>
+              {subtitle}
+            </span>
+            <h2 className={`text-3xl md:text-5xl font-serif font-bold ${dark ? 'text-white' : 'text-slate-900'} mb-4`}>
+              {title}
+            </h2>
+            <div className={`h-1 w-20 mx-auto ${dark ? 'bg-amber-500' : 'bg-blue-600'}`}></div>
+          </div>
+        );
+
+        const SourceBadge = ({ code }) => (
+          <span className="inline-block ml-2 text-[10px] font-mono uppercase text-slate-400 border border-slate-200 px-1 rounded hover:bg-slate-100 hover:text-blue-600 transition-colors cursor-help" title={`Quelle: ${code}`}>
+            [{code}]
+          </span>
+        );
+
+        // --- MAIN APP COMPONENT ---
+
+        function App() {
+          const [activeTab, setActiveTab] = useState('versicherung');
+          const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+          const [scrolled, setScrolled] = useState(false);
+
+          useEffect(() => {
+            const handleScroll = () => setScrolled(window.scrollY > 50);
+            window.addEventListener('scroll', handleScroll);
+            return () => window.removeEventListener('scroll', handleScroll);
+          }, []);
+
+          return (
+            <div className="font-sans text-slate-600 bg-slate-50 selection:bg-amber-100 selection:text-amber-900">
+              
+              {/* --- NAVIGATION --- */}
+              <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-md py-3' : 'bg-transparent py-6'}`}>
+                <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 bg-slate-900 text-white flex items-center justify-center font-serif font-bold text-xl rounded-lg">L</div>
+                    <span className={`font-serif font-bold text-xl ${scrolled ? 'text-slate-900' : 'text-slate-900'}`}>
+                      Leitfaden<span className="text-amber-600">.Selbst</span>
+                    </span>
+                  </div>
+
+                  {/* Desktop Menu */}
+                  <div className="hidden md:flex gap-8 text-sm font-medium text-slate-600">
+                    {['Ablauf', 'Businessplan', 'Rechtsformen', 'Finanzen', 'Förderung'].map((item) => (
+                      <a key={item} href={`#${item.toLowerCase()}`} className="hover:text-amber-600 transition-colors relative group">
+                        {item}
+                        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-500 transition-all group-hover:w-full"></span>
+                      </a>
+                    ))}
+                  </div>
+
+                  {/* Mobile Menu Toggle */}
+                  <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                    {mobileMenuOpen ? <X /> : <Menu />}
+                  </button>
+                </div>
+
+                {/* Mobile Dropdown */}
+                {mobileMenuOpen && (
+                  <div className="absolute top-full left-0 w-full bg-white border-b border-slate-100 shadow-xl md:hidden flex flex-col p-4">
+                    {['Ablauf', 'Businessplan', 'Rechtsformen', 'Finanzen', 'Förderung'].map((item) => (
+                      <a 
+                        key={item} 
+                        href={`#${item.toLowerCase()}`}
+                        className="py-3 px-4 hover:bg-slate-50 rounded-lg text-slate-800 font-medium"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {item}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </nav>
+
+              {/* --- HERO SECTION --- */}
+              <header className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-100/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 -z-10"></div>
+                <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-amber-50/80 rounded-full blur-3xl translate-y-1/4 -translate-x-1/4 -z-10"></div>
+
+                <div className="max-w-7xl mx-auto px-6 text-center">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-500 tracking-wider uppercase mb-8 shadow-sm">
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> WBL Projektarbeit 12/1
+                  </div>
+                  
+                  <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold text-slate-900 mb-8 leading-[1.1]">
+                    Vom Traum zur <br />
+                    <span className="relative z-10 inline-block">
+                      <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-slate-900">Wirklichkeit.</span>
+                      <span className="absolute bottom-2 left-0 w-full h-4 bg-amber-200/60 -z-10 -rotate-1"></span>
+                    </span>
+                  </h1>
+                  
+                  <p className="text-xl md:text-2xl text-slate-500 max-w-2xl mx-auto mb-12 leading-relaxed">
+                    Der interaktive Kompass durch Bürokratie, Steuern und Förderungen. Fundiert, vollständig und verständlich.
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#ablauf" className="px-8 py-4 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                      <Compass size={20} />
+                      Tour starten
+                    </a>
+                    <a href="#foerderung" className="px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-xl font-medium hover:border-amber-400 hover:text-amber-600 transition-all flex items-center justify-center gap-2">
+                      <Coins size={20} />
+                      Fördermittel finden
+                    </a>
+                  </div>
+                </div>
+              </header>
+
+              {/* --- SECTION 1: TIMELINE (ROADMAP) --- */}
+              <section id="ablauf" className="py-24 bg-white relative">
+                <SectionTitle subtitle="Der Fahrplan" title="Dein Weg zur Gründung" />
+                
+                <div className="max-w-5xl mx-auto px-6 relative">
+                  <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 bg-slate-200"></div>
+
+                  <div className="space-y-12">
+                    {timelineData.map((item, index) => (
+                      <div key={index} className={`relative flex md:items-center ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+                        <div className={`absolute left-6 md:left-1/2 -translate-x-1/2 w-12 h-12 rounded-full border-4 border-white shadow-lg flex items-center justify-center z-10 ${item.highlight ? 'bg-amber-500 text-white scale-110' : 'bg-slate-900 text-white'}`}>
+                          {item.highlight ? <Building2 size={20} /> : <span className="font-bold">{item.step}</span>}
+                        </div>
+
+                        <div className={`ml-16 md:ml-0 md:w-1/2 ${index % 2 === 0 ? 'md:pr-12 md:text-right' : 'md:pl-12 md:text-left'}`}>
+                          <div className={`p-6 rounded-2xl border ${item.highlight ? 'bg-slate-900 text-white border-slate-800 shadow-2xl ring-4 ring-amber-100' : 'bg-white border-slate-100 shadow-sm hover:shadow-md'} transition-all`}>
+                            <h3 className={`text-xl font-bold font-serif mb-2 ${item.highlight ? 'text-amber-400' : 'text-slate-900'}`}>
+                              {item.title}
+                            </h3>
+                            <p className={`text-sm leading-relaxed ${item.highlight ? 'text-slate-300' : 'text-slate-500'}`}>
+                              {item.desc} <SourceBadge code={item.source} />
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              {/* --- SECTION 2: BUSINESSPLAN (ACCORDION) --- */}
+              <section id="businessplan" className="py-24 bg-slate-50">
+                <SectionTitle subtitle="Das Fundament" title="Der Businessplan" />
+                
+                <div className="max-w-4xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-start">
+                  <div className="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 sticky top-32">
+                    <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6">
+                      <FileText size={32} />
+                    </div>
+                    <h3 className="text-2xl font-bold font-serif mb-4 text-slate-900">Warum ein Plan?</h3>
+                    <p className="text-slate-600 mb-6 leading-relaxed">
+                      Ein Businessplan ist keine lästige Pflicht, sondern deine Navigationskarte. Er zwingt dich, Risiken zu durchdenken und Finanzen realistisch zu kalkulieren.
+                    </p>
+                    <ul className="space-y-3">
+                      <li className="flex items-center gap-3 text-sm font-medium text-slate-700">
+                        <CheckCircle2 size={18} className="text-green-500" /> Überzeugt Investoren & Banken
+                      </li>
+                      <li className="flex items-center gap-3 text-sm font-medium text-slate-700">
+                        <CheckCircle2 size={18} className="text-green-500" /> Deckt Wissenslücken auf
+                      </li>
+                      <li className="flex items-center gap-3 text-sm font-medium text-slate-700">
+                        <CheckCircle2 size={18} className="text-green-500" /> Fahrplan für die ersten 3 Jahre
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="space-y-4">
+                    {businessPlanChapters.map((chapter, idx) => (
+                      <details key={idx} className="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden cursor-pointer open:ring-2 open:ring-blue-100 transition-all">
+                        <summary className="flex justify-between items-center p-5 font-bold text-slate-800 hover:bg-slate-50 select-none">
+                          {chapter.title}
+                          <ChevronDown className="text-slate-400 group-open:rotate-180 transition-transform" size={20} />
+                        </summary>
+                        <div className="px-5 pb-5 pt-0 text-slate-600 text-sm leading-relaxed border-t border-slate-100 mt-2 pt-4">
+                          {chapter.content} <SourceBadge code={chapter.source} />
+                        </div>
+                      </details>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              {/* --- SECTION 3: RECHTSFORMEN (CARDS) --- */}
+              <section id="rechtsformen" className="py-24 bg-slate-900 text-white">
+                <SectionTitle subtitle="Struktur & Haftung" title="Rechtsformen im Vergleich" dark />
+                
+                <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-8">
+                  {legalFormsData.map((form, idx) => {
+                    const Icon = form.icon;
+                    return (
+                    <div key={idx} className="bg-slate-800 rounded-3xl p-8 border border-slate-700 hover:border-amber-500/50 hover:bg-slate-750 transition-all group relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
+                      
+                      <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center mb-6 group-hover:bg-amber-500 group-hover:text-slate-900 transition-colors">
+                        <Icon size={24} />
+                      </div>
+                      
+                      <h3 className="text-2xl font-bold font-serif mb-2">{form.type}</h3>
+                      <p className="text-slate-400 text-sm mb-6 min-h-[40px]">{form.desc}</p>
+                      
+                      <div className="space-y-6">
+                        <div>
+                          <h4 className="text-xs font-bold text-green-400 uppercase tracking-wider mb-2">Vorteile</h4>
+                          <ul className="space-y-1">
+                            {form.pros.map((pro, i) => (
+                              <li key={i} className="flex items-start gap-2 text-sm text-slate-300">
+                                <CheckCircle2 size={14} className="text-green-500 mt-1 shrink-0" /> {pro}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        
+                        <div>
+                          <h4 className="text-xs font-bold text-red-400 uppercase tracking-wider mb-2">Nachteile</h4>
+                          <ul className="space-y-1">
+                            {form.cons.map((con, i) => (
+                              <li key={i} className="flex items-start gap-2 text-sm text-slate-300">
+                                <X size={14} className="text-red-500 mt-1 shrink-0" /> {con}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+
+                      <div className="mt-8 pt-6 border-t border-slate-700">
+                        <p className="text-xs text-slate-500 font-mono">Bsp: {form.examples.join(', ')} <SourceBadge code={form.source} /></p>
+                      </div>
+                    </div>
+                  )})}
+                </div>
+              </section>
+
+              {/* --- SECTION 4: FINANZEN (INTERACTIVE TABS) --- */}
+              <section id="finanzen" className="py-24 bg-white">
+                <SectionTitle subtitle="Pflichten & Geld" title="Steuern & Sozialversicherung" />
+                
+                <div className="max-w-5xl mx-auto px-6">
+                  <div className="flex justify-center mb-12">
+                    <div className="bg-slate-100 p-1.5 rounded-2xl inline-flex">
+                      <button 
+                        onClick={() => setActiveTab('versicherung')}
+                        className={`px-6 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'versicherung' ? 'bg-white text-slate-900 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
+                      >
+                        Sozialversicherungen
+                      </button>
+                      <button 
+                        onClick={() => setActiveTab('steuer')}
+                        className={`px-6 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'steuer' ? 'bg-white text-slate-900 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
+                      >
+                        Steuern & Fristen
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-50 rounded-3xl p-8 md:p-12 border border-slate-100 min-h-[400px]">
+                    
+                    {activeTab === 'versicherung' && (
+                      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="grid md:grid-cols-2 gap-12">
+                          <div>
+                            <h3 className="text-2xl font-bold font-serif mb-4 flex items-center gap-3">
+                              <ShieldCheck className="text-green-600" /> Absicherung
+                            </h3>
+                            <p className="text-slate-600 mb-6 leading-relaxed">
+                              Selbstständige sind nicht automatisch geschützt. Du musst dich aktiv kümmern. Die Krankenversicherung ist Pflicht, alles andere optional (aber empfohlen).
+                            </p>
+                            <div className="bg-white p-6 rounded-xl border-l-4 border-amber-500 shadow-sm mb-6">
+                              <h4 className="font-bold text-slate-900 mb-1">Achtung: Rentenpflicht</h4>
+                              <p className="text-sm text-slate-500">Bestimmte Berufe (Lehrer, Hebammen, Künstler) sind <strong>rentenversicherungspflichtig</strong>!</p>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-4">
+                            <div className="bg-white p-5 rounded-xl shadow-sm">
+                              <h4 className="font-bold text-slate-900">1. Kranken- & Pflegeversicherung</h4>
+                              <p className="text-sm text-slate-500 mt-1">Pflicht seit 2007. Wahl zwischen GKV (ca. 14,6% vom Einkommen) oder PKV (risikoabhängig).</p>
+                            </div>
+                            <div className="bg-white p-5 rounded-xl shadow-sm">
+                              <h4 className="font-bold text-slate-900">2. Rentenversicherung</h4>
+                              <p className="text-sm text-slate-500 mt-1">Meist freiwillig. Optionen: Gesetzlich (Pflichtantrag), Rürup-Rente oder private Assets.</p>
+                            </div>
+                            <div className="bg-white p-5 rounded-xl shadow-sm">
+                              <h4 className="font-bold text-slate-900">3. Unfall- & Arbeitslosenvers.</h4>
+                              <p className="text-sm text-slate-500 mt-1">Arbeitslosenversicherung ist auf Antrag möglich (teuer). BG ist Pflicht für bestimmte Branchen.</p>
+                            </div>
+                            <div className="text-right"><SourceBadge code="WBL" /></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTab === 'steuer' && (
+                      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
+                          <div className="bg-amber-100 text-amber-800 px-4 py-3 rounded-lg flex items-start gap-3 text-sm md:w-2/3">
+                            <Calendar className="shrink-0 mt-0.5" size={18} />
+                            <div>
+                              <strong>Liquiditätsfalle Vorauszahlung!</strong><br/>
+                              Das Finanzamt fordert Einkommensteuer vierteljährlich im Voraus (10.03., 10.06., 10.09., 10.12.). Lege ca. 30-40% deines Gewinns sofort zurück.
+                            </div>
+                          </div>
+                          <div className="text-right flex-1"><SourceBadge code="WBL" /></div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-4">
+                          {taxesData.map((tax, idx) => (
+                            <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:border-blue-200 transition-colors">
+                              <div className="flex justify-between items-start mb-2">
+                                <h4 className="font-bold text-slate-900">{tax.name}</h4>
+                                <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded ${tax.type === 'Vorauszahlung' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
+                                  {tax.type}
+                                </span>
+                              </div>
+                              <div className="text-2xl font-serif font-bold text-blue-600 mb-2">{tax.rate}</div>
+                              <p className="text-sm text-slate-500 mb-3">{tax.info}</p>
+                              {tax.deadlines.length > 0 && (
+                                <div className="text-xs text-slate-400 font-mono bg-slate-50 p-2 rounded">
+                                  Fristen: {tax.deadlines.join(', ')}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                  </div>
+                </div>
+              </section>
+
+              {/* --- SECTION 5: FÖRDERUNG (GRID) --- */}
+              <section id="foerderung" className="py-24 bg-white border-t border-slate-200">
+                <div className="max-w-7xl mx-auto px-6">
+                  <div className="flex flex-col md:flex-row justify-between items-end mb-16">
+                    <div className="max-w-2xl">
+                      <h2 className="text-3xl md:text-5xl font-serif font-bold text-slate-900 mb-4">Starthilfe nutzen</h2>
+                      <p className="text-slate-600">
+                        Warum alles selbst zahlen? Deutschland bietet diverse Fördertöpfe für Gründer. Von Zuschüssen bis zu günstigen Krediten.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {[
+                      {
+                        title: "Gründungszuschuss",
+                        org: "Arbeitsagentur",
+                        desc: "Für ALG-1 Empfänger. Sicherung des Lebensunterhalts für 6+9 Monate.",
+                        tag: "Zuschuss",
+                        color: "bg-green-50 text-green-700"
+                      },
+                      {
+                        title: "Förderkredite",
+                        org: "KfW Bank",
+                        desc: "Zinsgünstig & Haftungsfreistellung für die Hausbank. Bis zu 25 Mio €.",
+                        tag: "Darlehen",
+                        color: "bg-blue-50 text-blue-700"
+                      },
+                      {
+                        title: "Beratungsförderung",
+                        org: "BAFA",
+                        desc: "Zuschuss zu Coaching-Kosten (Businessplan, Finanzen).",
+                        tag: "Zuschuss",
+                        color: "bg-amber-50 text-amber-700"
+                      },
+                      {
+                        title: "KOMPASS",
+                        org: "Für Solopreneure",
+                        desc: "Förderung von Qualifizierung (IT, Digitalisierung) für Solo-Selbstständige.",
+                        tag: "Bildung",
+                        color: "bg-purple-50 text-purple-700"
+                      }
+                    ].map((item, idx) => (
+                      <div key={idx} className="bg-slate-50 p-6 rounded-2xl hover:bg-white hover:shadow-xl hover:-translate-y-1 transition-all border border-transparent hover:border-slate-100 group">
+                        <span className={`inline-block px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider mb-4 ${item.color}`}>
+                          {item.tag}
+                        </span>
+                        <h3 className="text-xl font-bold mb-1 group-hover:text-blue-600 transition-colors">{item.title}</h3>
+                        <p className="text-xs font-bold text-slate-400 uppercase mb-3">{item.org}</p>
+                        <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
+                        <div className="mt-4 pt-4 border-t border-slate-200 text-right">
+                          <SourceBadge code="HfS" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              {/* --- FOOTER --- */}
+              <footer className="bg-slate-900 text-slate-400 py-16">
+                <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-12 text-sm">
+                  <div className="col-span-1 md:col-span-2">
+                    <span className="font-serif font-bold text-2xl text-white block mb-4">
+                      Leitfaden<span className="text-amber-500">.Selbst</span>
+                    </span>
+                    <p className="max-w-xs leading-relaxed opacity-80">
+                      Ein Projekt im Rahmen der WBL Klausur. Ziel ist es, angehenden Gründern einen klaren, strukturierten Weg in die Selbstständigkeit aufzuzeigen.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-bold text-white uppercase tracking-widest text-xs mb-6">Quellenverzeichnis</h4>
+                    <ul className="space-y-2 font-mono text-xs">
+                      <li>[DWzS] Dein Weg zur Selbstständigkeit</li>
+                      <li>[BP] Businessplan.docx</li>
+                      <li>[RF] Rechtsformen.docx</li>
+                      <li>[WBL] wbl lea (2).docx</li>
+                      <li>[HfS] Hilfe für Selbstständige.docx</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-white uppercase tracking-widest text-xs mb-6">Projekt</h4>
+                    <ul className="space-y-2">
+                      <li>Klausur WBL 12/1</li>
+                      <li>Note 1,0 Anforderung</li>
+                      <li>Stand: November 2025</li>
+                      <li>&copy; Projektteam</li>
+                    </ul>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
+
