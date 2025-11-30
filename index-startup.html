@@ -404,7 +404,7 @@
                 </div>
               </div>
 
-              <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 animate-bounce z-20">
+              <div className="absolute bottom-12 left-0 right-0 mx-auto w-fit flex flex-col items-center gap-2 opacity-50 animate-bounce z-20">
                 <span className="text-xs font-mono text-slate-400">SCROLL</span>
                 <div className="w-px h-12 bg-gradient-to-b from-slate-400 to-transparent"></div>
               </div>
@@ -484,7 +484,7 @@
                 <div className="grid md:grid-cols-2 gap-12">
                   
                   {/* LEFT: Scrolling Text Content */}
-                  <div className="pt-12 pb-24 md:py-[50vh]">
+                  <div className="pt-12 pb-24 md:py-32">
                     {SCROLL_STORY_DATA.map((step) => (
                       <div 
                         key={step.id} 
