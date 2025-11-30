@@ -638,21 +638,21 @@
                   </div>
 
                   <div className="lg:col-span-8">
-                    <div className="bg-slate-800 border border-slate-700 rounded-3xl p-8 h-full relative overflow-hidden min-h-[600px] md:min-h-[400px]">
+                    <div className="bg-slate-800 border border-slate-700 rounded-3xl p-4 md:p-8 h-full relative overflow-hidden min-h-[600px] md:min-h-[400px]">
                       {LEGAL_DETAILS.map((item) => (
                         <div 
                           key={item.key}
-                          className={`transition-all duration-500 p-8 flex flex-col justify-center ${activeForm === item.key ? 'block relative opacity-100 translate-y-0 z-10' : 'hidden md:block md:absolute md:opacity-0 md:translate-y-10 md:pointer-events-none z-0'}`}
+                          className={`transition-all duration-500 p-4 md:p-8 flex flex-col justify-center ${activeForm === item.key ? 'block relative opacity-100 translate-y-0 z-10' : 'hidden md:block md:absolute md:opacity-0 md:translate-y-10 md:pointer-events-none z-0'}`}
                         >
-                          <div className="flex items-center gap-4 mb-8">
-                            <div className="p-4 bg-slate-700 rounded-2xl">
+                          <div className="flex flex-col md:flex-row md:items-center gap-4 mb-8">
+                            <div className="p-4 bg-slate-700 rounded-2xl w-fit">
                               {item.key === 'einzel' && <Users size={32} className="text-blue-400" />}
                               {item.key === 'person' && <Users size={32} className="text-purple-400" />}
                               {item.key === 'kapital' && <Building2 size={32} className="text-emerald-400" />}
                             </div>
                             <div>
-                              <h3 className="text-3xl font-bold">{item.title}</h3>
-                              <span className="text-slate-400 font-mono text-sm">Beispiele: {item.examples}</span>
+                              <h3 className="text-2xl md:text-3xl font-bold break-words">{item.title}</h3>
+                              <span className="text-slate-400 font-mono text-sm break-words block mt-1">Beispiele: {item.examples}</span>
                             </div>
                           </div>
 
@@ -663,7 +663,7 @@
                               </h4>
                               <ul className="space-y-3">
                                 {item.pros.map((p, i) => (
-                                  <li key={i} className="text-slate-300 text-sm border-l-2 border-green-500/30 pl-3">{p}</li>
+                                  <li key={i} className="text-slate-300 text-sm border-l-2 border-green-500/30 pl-3 break-words">{p}</li>
                                 ))}
                               </ul>
                             </div>
@@ -673,12 +673,12 @@
                               </h4>
                               <ul className="space-y-3">
                                 {item.cons.map((c, i) => (
-                                  <li key={i} className="text-slate-300 text-sm border-l-2 border-red-500/30 pl-3">{c}</li>
+                                  <li key={i} className="text-slate-300 text-sm border-l-2 border-red-500/30 pl-3 break-words">{c}</li>
                                 ))}
                               </ul>
                             </div>
                           </div>
-                          <div className="mt-auto pt-8 text-right">
+                          <div className="mt-8 pt-8 text-right border-t border-slate-700/50">
                             <span className="text-xs text-slate-600 font-mono">[Quelle: {item.source}]</span>
                           </div>
                         </div>
@@ -721,7 +721,7 @@
             <section id="finance" className="py-24 bg-white">
               <div className="max-w-7xl mx-auto px-6">
                 <div className="grid md:grid-cols-2 gap-16 items-start">
-                  <div className="sticky top-32">
+                  <div className="relative md:sticky md:top-32">
                     <h2 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-6">
                       Die <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">Liquiditätsfalle</span>
                     </h2>
