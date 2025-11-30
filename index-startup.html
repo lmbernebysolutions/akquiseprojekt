@@ -125,7 +125,7 @@
             phase: 'Phase 2: Der Bauplan',
             title: 'Der Businessplan',
             text: 'Kein Haus ohne Statik. Dein Businessplan ist das Herzstück für Investoren und deine eigene Klarheit. Er zwingt dich, Risiken zu durchdenken.',
-            checklist: ['Executive Summary', 'Finanzplan (Kapitalbedarf)', 'Marketing-Mix (4Ps)'],
+            checklist: ['Executive Summary', 'Finanzplan (Kapitalbedarf)', 'Marketing-Mix'],
             source: 'Jasmin',
             color: 'from-blue-50 to-indigo-50',
             icon: BookOpen,
@@ -485,11 +485,11 @@
                   
                   {/* LEFT: Scrolling Text Content */}
                   <div className="pt-0 pb-24 md:pt-0 md:pb-32">
-                    {SCROLL_STORY_DATA.map((step) => (
+                    {SCROLL_STORY_DATA.map((step, index) => (
                       <div 
                         key={step.id} 
                         id={step.id} 
-                        className={`min-h-[70vh] md:min-h-[80vh] flex flex-col justify-center transition-opacity duration-500 ${activeId === step.id ? 'opacity-100' : 'opacity-30 blur-sm'}`}
+                        className={`${index === 0 ? 'pt-32 md:pt-48 justify-start min-h-[70vh]' : 'min-h-[70vh] md:min-h-[80vh] justify-center'} flex flex-col transition-opacity duration-500 ${activeId === step.id ? 'opacity-100' : 'opacity-30 blur-sm'}`}
                       >
                         <div className="flex items-center gap-3 mb-4">
                           <div className="p-3 bg-white rounded-xl shadow-sm">
@@ -865,7 +865,7 @@
                     { 
                       title: "Gründungszuschuss", 
                       sub: "Arbeitsagentur",
-                      desc: "Sichert den Lebensunterhalt für ALG-I Empfänger. 6 - 9 Monate Förderung möglich.",
+                      desc: "Besonders für ALG-1 Empfänger. Sichert Lebensunterhalt. Voraussetzung: Tragfähiges Konzept & Qualifikation.",
                       icon: Zap,
                       bg: "bg-yellow-500"
                     },
