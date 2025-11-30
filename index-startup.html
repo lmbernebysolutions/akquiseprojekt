@@ -185,6 +185,13 @@
           }
         ];
 
+        const FORMALITIES_STEPS = [
+            { title: "1. Genehmigungen", desc: "Erlaubnisse, Gesundheitszeugnis, Meisterbrief? Kläre dies vorab.", icon: ShieldCheck, color: "bg-amber-100 text-amber-600" },
+            { title: "2. Ämter", desc: "Gewerbeamt (20-60€) oder Finanzamt (Freiberufler). Fragebogen zur steuerlichen Erfassung.", icon: Building2, color: "bg-blue-100 text-blue-600" },
+            { title: "3. Kammern", desc: "IHK/HWK Mitgliedschaft ist meist Pflicht. Berufsgenossenschaft binnen 1 Woche.", icon: ClipboardCheck, color: "bg-purple-100 text-purple-600" },
+            { title: "4. Konto", desc: "Geschäftskonto eröffnen. Trennung privat/geschäftlich ist essentiell.", icon: Wallet, color: "bg-emerald-100 text-emerald-600" }
+        ];
+
         // --- HOOKS ---
         const useScrollProgress = () => {
           const [progress, setProgress] = useState(0);
