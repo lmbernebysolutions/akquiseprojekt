@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+<head>
+    <script>if(!sessionStorage.getItem("auth")){window.location.href="/"}</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StartUp Guide - Der interaktive Wegweiser</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel Standalone -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    animation: {
+                        blob: "blob 7s infinite",
+                    },
+                    keyframes: {
+                        blob: {
+                            "0%": { transform: "translate(0px, 0px) scale(1)" },
+                            "33%": { transform: "translate(30px, -50px) scale(1.1)" },
+                            "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
+                            "100%": { transform: "translate(0px, 0px) scale(1)" },
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="font-sans text-slate-600 bg-white selection:bg-blue-200 selection:text-blue-900">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- ICON COMPONENTS (Inline SVGs) ---
+        const IconBase = ({ children, size = 24, className = "", ...props }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+                {children}
+            </svg>
+        );
+
+        const ArrowRight = (props) => <IconBase {...props}><line x1="5" x2="19" y1="12" y2="12"/><polyline points="12 5 19 12 12 19"/></IconBase>;
+        const BookOpen = (props) => <IconBase {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></IconBase>;
+        const Building2 = (props) => <IconBase {...props}><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></IconBase>;
+        const CalendarClock = (props) => <IconBase {...props}><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h5"/><path d="M17.5 17.5 16 16.25V14"/><path d="M22 16a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z"/></IconBase>;
+        const CheckCircle2 = (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></IconBase>;
+        const Coins = (props) => <IconBase {...props}><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></IconBase>;
+        const Compass = (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></IconBase>;
+        const FileText = (props) => <IconBase {...props}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></IconBase>;
+        const Fingerprint = (props) => <IconBase {...props}><path d="M2 12C2 6.5 6.5 2 12 2a10 10 0 0 1 8 4"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2.5"/><path d="M8.63 7.17A2 2 0 0 1 9.71 5.5c.35-.17.98-.5 1.29-.5"/><path d="M13.83 5.7c.7.11 1.18.31 1.17.56"/><path d="M15.86 7C17.21 8.65 18 10.25 18 12c0 1.22-.24 2.4-.69 3.5"/><path d="M1.42 14a8.72 8.72 0 0 1 14.18-6"/><path d="M18.84 18a10.26 10.26 0 0 0 2.74-6"/><path d="M12.17 17.66A6 6 0 0 1 13 12a6 6 0 0 0-3.27-5.5"/><path d="M9 17.5a2.5 2.5 0 0 0 2.5-2.5V12a2.5 2.5 0 0 1 5 0v3"/></IconBase>;
+        const Landmark = (props) => <IconBase {...props}><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></IconBase>;
+        const Lightbulb = (props) => <IconBase {...props}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></IconBase>;
+        const TrendingUp = (props) => <IconBase {...props}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></IconBase>;
+        const Users = (props) => <IconBase {...props}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></IconBase>;
+        const AlertTriangle = (props) => <IconBase {...props}><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></IconBase>;
+        const X = (props) => <IconBase {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></IconBase>;
+        
+        function ScaleIcon({ className, size=24 }) {
+            return (
+                <IconBase className={className} size={size}>
+                    <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+                    <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+                    <path d="M7 21h10"/>
+                    <path d="M12 3v18"/>
+                    <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>
+                </IconBase>
+            );
+        }
+
+        // --- DATA ---
+        // UPDATED: Source names mapped to Jasmin, Elsa, Merle, Lea
+        const STORY_STEPS = [
+          {
+            id: 'idee',
+            year: 'Phase 1',
+            title: 'Der Funke',
+            subtitle: 'Geschäftsidee & Analyse',
+            desc: 'Alles beginnt mit einer Frage: Was kannst du besser als andere? Analysiere deine Fähigkeiten und den Markt. Brennst du für die Idee? Sind Kunden bereit, dafür zu zahlen?',
+            icon: Lightbulb,
+            color: 'bg-yellow-500',
+            source: 'Elsa'
+          },
+          {
+            id: 'plan',
+            year: 'Phase 2',
+            title: 'Das Fundament',
+            subtitle: 'Der Businessplan',
+            desc: 'Kein Haus ohne Bauplan. Strukturieren dein Konzept für Investoren und für deine eigene Klarheit. (Executive Summary, Markt, Marketing, Finanzplan).',
+            icon: BookOpen,
+            color: 'bg-blue-600',
+            source: 'Jasmin'
+          },
+          {
+            id: 'recht',
+            year: 'Phase 3',
+            title: 'Die Form',
+            subtitle: 'Rechtsformen & Genehmigungen',
+            desc: 'Einzelkämpfer oder Team? Volles Risiko oder beschränkte Haftung? Meisterbrief nötig? Hier werden die Weichen für Haftung und Steuern gestellt.',
+            icon: ScaleIcon,
+            color: 'bg-indigo-600',
+            source: 'Merle'
+          },
+          {
+            id: 'amt',
+            year: 'Phase 4',
+            title: 'Der offizielle Akt',
+            subtitle: 'Anmeldung & Behörden',
+            desc: 'Der Gang zum Gewerbeamt und der "Fragebogen zur steuerlichen Erfassung" beim Finanzamt. Jetzt bist du offiziell Gründer.',
+            icon: Landmark,
+            color: 'bg-slate-800',
+            source: 'Elsa'
+          },
+          {
+            id: 'geld',
+            year: 'Phase 5',
+            title: 'Die Realität',
+            subtitle: 'Steuern, Versicherung & Förderung',
+            desc: 'Willkommen in der Welt der Abgaben. Einkommensteuer-Vorauszahlungen, Krankenversicherungspflicht und Fördermittel-Anträge.',
+            icon: Coins,
+            color: 'bg-emerald-600',
+            source: 'Lea'
+          }
+        ];
+
+        const LEGAL_FORMS = [
+          {
+            type: "Einzelunternehmen",
+            icon: Users,
+            desc: "Der Solist.",
+            details: "Kein Mindestkapital, volle Kontrolle, aber unbeschränkte persönliche Haftung. Ideal für den schnellen Start.",
+            pros: ["Einfache Gründung", "Kein Stammkapital", "Kein Notar"],
+            cons: ["Volle private Haftung", "Wenig Image bei Banken"],
+            examples: "Freiberufler, Kleingewerbe, e.K."
+          },
+          {
+            type: "Personengesellschaften",
+            icon: Users,
+            desc: "Die Partner.",
+            details: "Mindestens zwei Gründer. Geteilte Verantwortung, aber oft auch geteilte (volle) Haftung.",
+            pros: ["Team-Gründung", "Flexible Gestaltung", "Kein Mindestkapital (GbR)"],
+            cons: ["Haftung mit Privatvermögen", "Konfliktpotenzial"],
+            examples: "GbR, OHG, KG"
+          },
+          {
+            type: "Kapitalgesellschaften",
+            icon: Building2,
+            desc: "Die Festung.",
+            details: "Juristische Person. Haftung ist auf das Firmenvermögen beschränkt. Hoher Aufwand, hohes Ansehen.",
+            pros: ["Haftungsbeschränkung", "Professionelles Image", "Investoren-freundlich"],
+            cons: ["Hohes Stammkapital (25k€ GmbH)", "Bilanzierungspflicht", "Notarkosten"],
+            examples: "GmbH, UG, AG"
+          }
+        ];
+
+        const TAX_INFO = [
+          { title: "Einkommensteuer", val: "14-45%", text: "Auf deinen Gewinn. Achtung: Progressiver Steuersatz!", date: "10.03 / 10.06..." },
+          { title: "Umsatzsteuer", val: "7% / 19%", text: "Durchlaufposten. Ausnahme: Kleinunternehmer (§19 UStG).", date: "Monatlich/Quartal" },
+          { title: "Gewerbesteuer", val: "3,5% x Hebesatz", text: "Steuer an die Gemeinde. Freibetrag 24.500€ (PersG).", date: "15.02 / 15.05..." },
+        ];
+
+        // --- HELPER HOOKS ---
+        const useScrollProgress = () => {
+          const [progress, setProgress] = useState(0);
+          useEffect(() => {
+            const updateScroll = () => {
+              const totalScroll = document.documentElement.scrollTop;
+              const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+              const scroll = totalScroll / windowHeight;
+              setProgress(scroll);
+            };
+            window.addEventListener('scroll', updateScroll);
+            return () => window.removeEventListener('scroll', updateScroll);
+          }, []);
+          return progress;
+        };
+
+        const useOnScreen = (options) => {
+          const ref = useRef(null);
+          const [isVisible, setVisible] = useState(false);
+
+          useEffect(() => {
+            const observer = new IntersectionObserver(([entry]) => {
+              if(entry.isIntersecting) {
+                setVisible(true);
+              }
+            }, options);
+
+            if (ref.current) observer.observe(ref.current);
+            return () => {
+              if (ref.current) observer.unobserve(ref.current);
+            };
+          }, [ref, options]);
+
+          return [ref, isVisible];
+        };
+
+        // --- COMPONENTS ---
+
+        const ScrollProgress = () => {
+          const progress = useScrollProgress();
+          return (
+            <div className="fixed top-0 left-0 w-full h-1.5 bg-slate-900 z-[100]">
+              <div 
+                className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-amber-500 transition-all duration-100 ease-out"
+                style={{ width: `${progress * 100}%` }}
+              />
+            </div>
+          );
+        };
+
+        const Navigation = () => {
+          const [isScrolled, setIsScrolled] = useState(false);
+          useEffect(() => {
+            const handler = () => setIsScrolled(window.scrollY > 50);
+            window.addEventListener('scroll', handler);
+            return () => window.removeEventListener('scroll', handler);
+          }, []);
+
+          return (
+            <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-slate-900/90 backdrop-blur-md py-4 shadow-lg' : 'bg-transparent py-6'}`}>
+              <div className="max-w-7xl mx-auto px-6 flex justify-between items-center text-white">
+                <div className="font-serif font-bold text-xl tracking-wider flex items-center gap-2">
+                  <div className="w-8 h-8 rounded bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-sans text-sm">SG</div>
+                  StartUp<span className="text-blue-400">Guide</span>
+                </div>
+                <div className="hidden md:flex gap-6 text-sm font-medium opacity-80">
+                  {STORY_STEPS.map(step => (
+                    <a key={step.id} href={`#${step.id}`} className="hover:text-white hover:opacity-100 transition-opacity">
+                      {step.title}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </nav>
+          );
+        };
+
+        const HeroSection = () => {
+          const [ref, isVisible] = useOnScreen({ threshold: 0.1 });
+          
+          return (
+            <section className="relative h-screen flex items-center justify-center overflow-hidden bg-slate-950 text-white">
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-800 via-slate-950 to-black opacity-80"></div>
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 animate-pulse"></div>
+              
+              <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-600/20 rounded-full blur-[100px] animate-blob"></div>
+              <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-600/20 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
+
+              <div ref={ref} className={`relative z-10 text-center max-w-4xl px-6 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
+                <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-slate-700 bg-slate-900/50 backdrop-blur text-sm font-mono text-blue-400">
+                  PROJEKTARBEIT
+                </div>
+                <h1 className="text-6xl md:text-8xl font-serif font-bold mb-8 leading-tight tracking-tight">
+                  Mut zum <br/>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-amber-400">Machen.</span>
+                </h1>
+                <p className="text-xl md:text-2xl text-slate-400 font-light leading-relaxed max-w-2xl mx-auto mb-12">
+                  Kein langweiliges Dokument. Eine interaktive Reise von der ersten Idee bis zur erfolgreichen Gründung.
+                </p>
+                
+                <a href="#idee" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-slate-950 rounded-full font-bold hover:bg-blue-50 transition-all hover:scale-105 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)]">
+                  Die Reise beginnen <ArrowRight size={20} />
+                </a>
+              </div>
+              
+              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-slate-500">
+                <div className="w-6 h-10 border-2 border-current rounded-full flex justify-center pt-2">
+                  <div className="w-1 h-2 bg-current rounded-full"></div>
+                </div>
+              </div>
+            </section>
+          );
+        };
+
+        const StoryChapter = ({ step, index }) => {
+          const [ref, isVisible] = useOnScreen({ threshold: 0.5 });
+          const isEven = index % 2 === 0;
+
+          return (
+            <div id={step.id} className="min-h-screen flex items-center justify-center relative py-24">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[20rem] font-bold text-slate-100 z-0 select-none leading-none">
+                {index + 1}
+              </div>
+
+              <div ref={ref} className="max-w-6xl w-full px-6 grid md:grid-cols-2 gap-16 items-center relative z-10">
+                <div className={`md:order-${isEven ? '1' : '2'} flex justify-center`}>
+                  <div className={`relative w-64 h-64 md:w-96 md:h-96 rounded-full flex items-center justify-center transition-all duration-1000 ${isVisible ? 'scale-100 opacity-100 rotate-0' : 'scale-50 opacity-0 -rotate-12'}`}>
+                    <div className={`absolute inset-0 rounded-full opacity-20 blur-3xl ${step.color}`}></div>
+                    <div className={`relative w-full h-full rounded-full border-2 border-slate-100 bg-white shadow-2xl flex items-center justify-center p-12`}>
+                      <step.icon size={80} className="text-slate-800" strokeWidth={1} />
+                    </div>
+                    <div className={`absolute -top-4 right-10 bg-white shadow-lg py-2 px-4 rounded-xl border border-slate-100 text-xs font-bold uppercase tracking-wider transition-all duration-1000 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                      Quelle: {step.source}
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`md:order-${isEven ? '2' : '1'} space-y-6 transition-all duration-1000 delay-200 ${isVisible ? 'translate-x-0 opacity-100' : isEven ? 'translate-x-20 opacity-0' : '-translate-x-20 opacity-0'}`}>
+                  <div className={`inline-block px-3 py-1 rounded text-xs font-bold text-white uppercase tracking-widest ${step.color}`}>
+                    {step.year}
+                  </div>
+                  <h2 className="text-5xl md:text-7xl font-serif font-bold text-slate-900 leading-none">
+                    {step.title}
+                  </h2>
+                  <h3 className="text-2xl font-light text-slate-500 border-b border-slate-200 pb-4 inline-block">
+                    {step.subtitle}
+                  </h3>
+                  <p className="text-lg text-slate-600 leading-relaxed">
+                    {step.desc}
+                  </p>
+                  
+                  {step.id === 'plan' && <BusinessPlanPreview />}
+                  {step.id === 'recht' && <LegalFormsPreview />}
+                  {step.id === 'geld' && <TaxWarning />}
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        const BusinessPlanPreview = () => (
+          <div className="mt-8 bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-inner">
+            <h4 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <FileText size={18} /> Die 9 Kapitel
+            </h4>
+            <div className="grid grid-cols-2 gap-2 text-sm text-slate-600">
+              <div className="flex items-center gap-2"><CheckCircle2 size={14} className="text-green-500"/> Executive Summary</div>
+              <div className="flex items-center gap-2"><CheckCircle2 size={14} className="text-green-500"/> Gründerprofil</div>
+              <div className="flex items-center gap-2"><CheckCircle2 size={14} className="text-green-500"/> Marktanalyse</div>
+              <div className="flex items-center gap-2"><CheckCircle2 size={14} className="text-green-500"/> Marketing-Mix</div>
+              <div className="flex items-center gap-2"><CheckCircle2 size={14} className="text-green-500"/> SWOT (Risiken)</div>
+              <div className="flex items-center gap-2 font-bold text-blue-600"><CheckCircle2 size={14} className="text-blue-600"/> Finanzplan!</div>
+            </div>
+          </div>
+        );
+
+        const TaxWarning = () => (
+          <div className="mt-6 bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="text-amber-600 shrink-0 mt-1" size={20} />
+              <div>
+                <h4 className="font-bold text-amber-900">Achtung: Liquiditätsfalle</h4>
+                <p className="text-sm text-amber-800 mt-1">
+                  Das Finanzamt verlangt <strong>Vorauszahlungen</strong> (Einkommen- & Gewerbesteuer) vierteljährlich! Lege ab Tag 1 ca. 30% deines Umsatzes zurück. (Quelle: Lea)
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+
+        const LegalFormsPreview = () => (
+          <div className="mt-6 flex gap-3 overflow-x-auto pb-4 snap-x no-scrollbar">
+            {['Einzelunternehmen', 'Personengesellschaft', 'Kapitalgesellschaft'].map((form, i) => (
+              <div key={i} className="min-w-[140px] bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-center snap-center">
+                <div className="text-xs uppercase font-bold text-slate-400 mb-1">Option {i+1}</div>
+                <div className="font-bold text-slate-800 text-sm">{form}</div>
+              </div>
+            ))}
+          </div>
+        );
+
+        const DetailedLegalSection = () => {
+          return (
+            <section className="py-32 bg-slate-900 text-white relative overflow-hidden">
+              <div className="max-w-7xl mx-auto px-6 relative z-10">
+                <div className="text-center mb-20">
+                  <h2 className="text-4xl md:text-6xl font-serif font-bold mb-6">Die Wahl der Rechtsform</h2>
+                  <p className="text-slate-400 max-w-2xl mx-auto text-lg">
+                    Haftung, Kapital und Image. Eine Entscheidung mit Tragweite.
+                  </p>
+                </div>
+
+                <div className="grid lg:grid-cols-3 gap-8">
+                  {LEGAL_FORMS.map((form, idx) => {
+                    const Icon = form.icon;
+                    return (
+                    <div key={idx} className="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl hover:bg-white/10 transition-all duration-500 group">
+                      <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                        <Icon size={32} className="text-white" />
+                      </div>
+                      <h3 className="text-2xl font-bold mb-2">{form.type}</h3>
+                      <p className="text-indigo-300 text-sm font-mono mb-4">{form.desc}</p>
+                      <p className="text-slate-300 mb-8 leading-relaxed text-sm h-16">
+                        {form.details}
+                      </p>
+                      
+                      <div className="space-y-4 border-t border-white/10 pt-6">
+                        <div>
+                          <span className="text-xs font-bold text-green-400 uppercase tracking-wider block mb-2">Vorteile</span>
+                          <ul className="space-y-1">
+                            {form.pros.map((p, i) => <li key={i} className="text-xs text-slate-400 flex items-center gap-2"><CheckCircle2 size={10}/> {p}</li>)}
+                          </ul>
+                        </div>
+                        <div>
+                          <span className="text-xs font-bold text-red-400 uppercase tracking-wider block mb-2">Nachteile</span>
+                          <ul className="space-y-1">
+                            {form.cons.map((c, i) => <li key={i} className="text-xs text-slate-400 flex items-center gap-2"><span className="w-2.5 h-[1px] bg-slate-500"/> {c}</li>)}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )})}
+                </div>
+              </div>
+            </section>
+          );
+        };
+
+        const FinanceSection = () => {
+          return (
+            <section className="py-32 bg-slate-50 relative">
+              <div className="max-w-5xl mx-auto px-6">
+                <div className="grid md:grid-cols-2 gap-16 items-center">
+                  <div>
+                    <span className="text-emerald-600 font-bold tracking-widest uppercase text-sm mb-2 block">Finanzen & Steuern</span>
+                    <h2 className="text-4xl md:text-6xl font-serif font-bold text-slate-900 mb-8">Pflichten kennen.<br/>Fehler vermeiden.</h2>
+                    <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+                      Die meisten Gründer scheitern nicht an der Idee, sondern an der Liquidität. Steuern sind keine Überraschung, sie sind planbar.
+                    </p>
+                    
+                    <div className="space-y-4">
+                      {TAX_INFO.map((tax, i) => (
+                        <div key={i} className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-emerald-500 hover:shadow-md transition-shadow">
+                          <div className="flex justify-between items-baseline mb-1">
+                            <h4 className="font-bold text-slate-900 text-lg">{tax.title}</h4>
+                            <span className="font-mono font-bold text-emerald-600">{tax.val}</span>
+                          </div>
+                          <p className="text-sm text-slate-500 mb-2">{tax.text}</p>
+                          <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-50 p-2 rounded w-fit">
+                            <CalendarClock size={12} /> Frist: {tax.date}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-emerald-100 to-blue-50 rounded-full blur-3xl opacity-60"></div>
+                    <div className="relative bg-white p-8 rounded-3xl shadow-2xl border border-slate-100">
+                      <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
+                        <Fingerprint className="text-slate-400" />
+                        Gründer-Checkliste
+                      </h3>
+                      <ul className="space-y-4">
+                        {[
+                          "Geschäftskonto eröffnen (Trennung privat/beruflich)",
+                          "Gewerbeanmeldung (Gewerbeamt)",
+                          "Steuerliche Erfassung (ELSTER)",
+                          "Krankenversicherung (GKV oder PKV)",
+                          "Berufshaftpflicht prüfen",
+                          "Steuerberater suchen"
+                        ].map((item, i) => (
+                          <li key={i} className="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer group">
+                            <div className="w-6 h-6 rounded-full border-2 border-slate-200 flex items-center justify-center group-hover:border-emerald-500 group-hover:bg-emerald-500 transition-all">
+                              <CheckCircle2 size={14} className="text-white opacity-0 group-hover:opacity-100" />
+                            </div>
+                            <span className="text-slate-600 text-sm group-hover:text-slate-900">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="mt-8 pt-6 border-t border-slate-100 text-center text-xs text-slate-400">
+                        Basierend auf: Dein Weg zur Selbstständigkeit
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          );
+        };
+
+        const FundingSection = () => {
+          return (
+            <section className="py-32 bg-slate-900 text-white">
+              <div className="max-w-7xl mx-auto px-6 text-center mb-16">
+                <h2 className="text-3xl md:text-5xl font-serif font-bold mb-6">Starthilfe nutzen</h2>
+                <p className="text-slate-400 max-w-2xl mx-auto">
+                  Du musst das Rad nicht neu erfinden – und auch nicht alleine finanzieren.
+                </p>
+              </div>
+
+              <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                  { title: "Gründungszuschuss", provider: "Arbeitsagentur", desc: "Für ALG-1 Empfänger. Lebensunterhalt für 6 - 9 Monate.", type: "Zuschuss" }, // UPDATED
+                  { title: "KfW-Kredite", provider: "KfW Bank", desc: "Zinsgünstig & Haftungsfreistellung für die Hausbank.", type: "Darlehen" },
+                  { title: "Beratungsförderung", provider: "BAFA", desc: "Zuschuss zu Coaching-Kosten (Businessplan, Finanzen).", type: "Coaching" },
+                  { title: "KOMPASS", provider: "Für Solopreneure", desc: "Förderung von Qualifizierung (IT, Digitalisierung).", type: "Bildung" }
+                ].map((item, i) => (
+                  <div key={i} className="group relative bg-white/5 border border-white/10 p-8 rounded-2xl hover:bg-white hover:text-slate-900 transition-all duration-300">
+                    <div className="text-xs font-bold uppercase tracking-wider text-blue-400 mb-2 group-hover:text-blue-600">{item.type}</div>
+                    <h3 className="text-xl font-bold mb-1">{item.title}</h3>
+                    <p className="text-xs text-slate-500 mb-4 font-mono">{item.provider}</p>
+                    <p className="text-sm text-slate-400 group-hover:text-slate-600 leading-relaxed">{item.desc}</p>
+                    
+                    <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">
+                      <ArrowRight size={20} className="text-blue-600" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        };
+
+        const Footer = () => (
+          <footer className="bg-black text-slate-500 py-12 border-t border-white/10">
+            <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+              <div>
+                <span className="text-white font-serif font-bold text-lg">StartUp<span className="text-blue-500">Guide</span></span>
+                <p className="text-xs mt-2">WBL Klausur Projekt</p>
+              </div>
+              <div className="text-xs font-mono space-x-4">
+                <span>Jasmin</span>
+                <span>Elsa</span>
+                <span>Merle</span>
+                <span>Lea</span>
+              </div>
+              <div className="text-xs">
+                &copy; 2025 Projektteam
+              </div>
+            </div>
+          </footer>
+        );
+
+        function App() {
+          return (
+            <div className="bg-white min-h-screen selection:bg-blue-200 selection:text-blue-900">
+              <ScrollProgress />
+              <Navigation />
+              
+              <main>
+                <HeroSection />
+                
+                {/* The Scroll Story Timeline */}
+                <div className="relative">
+                  {/* Connecting Line through chapters */}
+                  <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-slate-300 to-transparent hidden md:block"></div>
+                  
+                  {STORY_STEPS.map((step, index) => (
+                    <StoryChapter key={step.id} step={step} index={index} />
+                  ))}
+                </div>
+
+                <DetailedLegalSection />
+                <FinanceSection />
+                <FundingSection />
+              </main>
+
+              <Footer />
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
+
