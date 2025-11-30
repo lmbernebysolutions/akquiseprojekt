@@ -75,7 +75,77 @@
         );
 
         const ArrowRight = (props) => <IconBase {...props}><line x1="5" x2="19" y1="12" y2="12"/><polyline points="12 5 19 12 12 19"/></IconBase>;
-        const BookOpen = (props) => <IconBase {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></IconBase>;
+        
+        const MockModal = ({ isOpen, onClose, title }) => {
+            if (!isOpen) return null;
+            
+            const documentContent = (
+                <div className="space-y-6 text-slate-700 leading-relaxed">
+                    <div className="text-center mb-8">
+                        <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-4">Hilfe, Unterstützung und Förderung von Selbstständigen in Deutschland</h1>
+                    </div>
+
+                    <p>Die Entscheidung, dich selbstständig zu machen, ist oft ein großer Schritt, der mit vielen Herausforderungen verbunden ist. Um dir auf diesem Weg zu helfen, gibt es in Deutschland zahlreiche Programme und Unterstützungsangebote. Diese reichen von finanzieller Förderung bis hin zu beratenden Dienstleistungen, die dazu beitragen, deine Erfolgschancen zu erhöhen und dein Unternehmen langfristig tragfähig zu machen.</p>
+
+                    <h3 className="text-xl font-bold text-slate-900 mt-8 mb-2">1. Gründungszuschuss der Bundesagentur für Arbeit</h3>
+                    <p>Die Bundesagentur für Arbeit unterstützt Menschen, die den Schritt in die Selbstständigkeit wagen, insbesondere wenn sie zuvor arbeitslos waren. Unter bestimmten Voraussetzungen kannst du einen Gründungszuschuss erhalten. Dieser Zuschuss dient dazu, deine ersten Monate der Selbstständigkeit finanziell abzusichern und den Übergang in die unternehmerische Tätigkeit zu erleichtern. Voraussetzung ist unter anderem, dass du über eine tragfähige Geschäftsidee und die nötige Qualifikation verfügst.</p>
+
+                    <h3 className="text-xl font-bold text-slate-900 mt-8 mb-2">2. KfW-Förderkredite</h3>
+                    <p>Für Unternehmer, die Kapital für Investitionen, Betriebsmittel oder die Unternehmensgründung benötigen, bietet die KfW-Bank verschiedene Förderkredite an. Besonders hervorzuheben ist der KfW-Kredit für kleine und mittlere Unternehmen sowie Freiberufler. Dieser Kredit kann bis zu 25 Millionen Euro betragen und dient nicht nur der Unternehmensgründung, sondern auch der Unternehmensnachfolge und -beteiligung. Der große Vorteil: Die KfW übernimmt 50 % des Kreditrisikos, was den Zugang zu Krediten erleichtert. Zudem bieten die Kredite attraktive Zinskonditionen, vor allem für junge Unternehmen und Vorhaben in sogenannten Regionalfördergebieten.</p>
+
+                    <h3 className="text-xl font-bold text-slate-900 mt-8 mb-2">3. BAFA-Förderung für Unternehmensberatungen</h3>
+                    <p>Ein weiteres Angebot für Sie ist das BAFA-Programm zur Förderung von Unternehmensberatungen. Ziel dieses Programms ist es, die Wettbewerbsfähigkeit von kleinen und mittleren Unternehmen zu stärken. Du kannst dich von qualifizierten Beraterinnen und Beratern in verschiedenen Bereichen wie Unternehmensführung, Finanzen oder Personal beraten lassen. Die Kosten für diese Beratungen werden durch einen nicht rückzahlbaren Zuschuss reduziert, was eine wichtige Unterstützung für Unternehmen darstellt, die sich in einer schwierigen Phase befinden oder ihre Strukturen verbessern möchten.</p>
+
+                    <h3 className="text-xl font-bold text-slate-900 mt-8 mb-2">4. KOMPASS-Programm für Solo-Selbstständige</h3>
+                    <p>Besonders Solo-Selbstständige, die oft vor der Herausforderung stehen, ihre Position am Markt zu behaupten und sich weiterzubilden, können vom KOMPASS-Programm profitieren. Dieses staatliche Förderprogramm hilft dabei, berufsbezogene Weiterbildungen zu finanzieren, die dein Geschäftsmodell krisenfest und zukunftssicher machen. Gefördert werden Weiterbildungen, die mindestens 20 Unterrichtseinheiten umfassen und zum Beispiel Themen wie Künstliche Intelligenz, Cybersecurity oder agiles Projektmanagement abdecken.</p>
+
+                    <h3 className="text-xl font-bold text-slate-900 mt-8 mb-2">5. Unternehmerkredite für Liquidität</h3>
+                    <p>Für Selbstständige, die kurzfristig Liquidität benötigen, gibt es spezielle Unternehmerkredite wie den VR Smart Basis Kredit. Dieser ermöglicht dir, schnell und unkompliziert zwischen 5.000 und 100.000 Euro zu erhalten, um etwa Investitionen zu tätigen oder Liquiditätsengpässe zu überbrücken. Besonders praktisch sind die schnelle Kreditentscheidung und die Auszahlung innerhalb von 24 Stunden. Der Kredit kann flexibel genutzt werden, und nach sechs Monaten gibt es die Möglichkeit, den Kredit vorzeitig abzulösen. Auch der VR Smart Flexibel Kredit bietet hohe Flexibilität und ermöglicht eine Anpassung der Laufzeit sowie eine Erhöhung der Kreditsumme.</p>
+
+                    <hr className="border-slate-200 my-8" />
+                    
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">Fazit</h3>
+                    <p>Die verschiedenen Förderprogramme und Unterstützungsmaßnahmen für dich in Deutschland bieten eine wertvolle Grundlage für den Erfolg und das Wachstum von deinem Unternehmen. Ob durch finanzielle Unterstützung, Beratungsangebote oder Weiterbildungsförderung – du kannst auf eine Vielzahl von Ressourcen zugreifen, die dir helfen, Herausforderungen zu meistern und deine unternehmerischen Ziele zu erreichen. Wenn du dich als Gründer oder Gründerin in Deutschland selbstständig machen möchtest, solltest du diese Unterstützungsangebote unbedingt in Anspruch nehmen, um deine Erfolgschancen zu maximieren.</p>
+                </div>
+            );
+
+            return (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
+                    <div className="bg-white rounded-2xl w-full max-w-3xl h-[85vh] shadow-2xl relative animate-in zoom-in-95 duration-200 flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
+                        
+                        {/* Header */}
+                        <div className="flex justify-between items-center p-4 px-6 border-b border-slate-100 bg-white sticky top-0 z-10">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center">
+                                    <FileText size={20} />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-slate-900 text-base">{title}</h3>
+                                    <p className="text-xs text-slate-500">Dokumentenansicht</p>
+                                </div>
+                            </div>
+                            <button onClick={onClose} className="text-slate-400 hover:text-slate-600 hover:bg-slate-50 p-2 rounded-full transition-colors">
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 overflow-y-auto p-6 md:p-10 bg-slate-50">
+                            <div className="bg-white shadow-sm border border-slate-200 p-8 md:p-12 mx-auto max-w-2xl rounded-xl">
+                                {documentContent}
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="p-4 border-t border-slate-100 bg-white flex justify-end">
+                             <button onClick={onClose} className="px-6 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg transition-colors text-sm">
+                                Schließen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
         const Building2 = (props) => <IconBase {...props}><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></IconBase>;
         const CalendarClock = (props) => <IconBase {...props}><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h5"/><path d="M17.5 17.5 16 16.25V14"/><path d="M22 16a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z"/></IconBase>;
         const CheckCircle2 = (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></IconBase>;
