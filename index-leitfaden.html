@@ -76,40 +76,41 @@
 
 
         // --- DATA & CONTENT ---
+        // UPDATE: Source names mapped to Jasmin, Elsa, Merle, Lea
         const timelineData = [
           {
             step: 1,
             title: "Geschäftsidee & Analyse",
             desc: "Was kannst du gut? Was motiviert dich? Wofür zahlen Kunden? Die Basis jeder Gründung.",
-            source: "DWzS",
+            source: "Elsa",
             icon: Lightbulb
           },
           {
             step: 2,
             title: "Businessplan",
             desc: "Strukturierung des Konzepts für Investoren und eigene Klarheit. (Details siehe unten)",
-            source: "BP",
+            source: "Jasmin",
             icon: FileText
           },
           {
             step: 3,
             title: "Genehmigungen & Rechtsform",
             desc: "Prüfung: Meisterbrief nötig? Gesundheitszeugnis? Wahl der Rechtsform (Einzel vs. Kapital).",
-            source: "RF",
+            source: "Merle",
             icon: ScaleIcon
           },
           {
             step: 4,
             title: "Identität & Branding",
             desc: "Namensfindung und Logo-Entwicklung. Alleinstellungsmerkmal definieren.",
-            source: "DWzS",
+            source: "Elsa",
             icon: Compass
           },
           {
             step: 5,
             title: "Gewerbeanmeldung",
             desc: "Der offizielle Akt: Gewerbeamt besuchen & Fragebogen zur steuerlichen Erfassung (Finanzamt).",
-            source: "DWzS",
+            source: "Elsa",
             icon: Building2,
             highlight: true
           },
@@ -117,7 +118,7 @@
             step: 6,
             title: "Operativer Start",
             desc: "Geschäftskonto, Versicherungen, Marketing und erste Rechnungen.",
-            source: "WBL",
+            source: "Lea",
             icon: CheckCircle2
           }
         ];
@@ -130,7 +131,7 @@
             pros: ["Kein Mindestkapital", "Einfache Gründung", "Volle Kontrolle"],
             cons: ["Unbeschränkte Haftung (Privatvermögen)", "Alleiniges Risiko"],
             examples: ["Freiberufler", "Kleingewerbe", "e.K."],
-            source: "RF"
+            source: "Merle"
           },
           {
             type: "Personengesellschaften",
@@ -139,7 +140,7 @@
             pros: ["Geteilte Verantwortung", "Kein Mindestkapital (GbR)"],
             cons: ["Meist volle persönliche Haftung", "Konfliktpotenzial"],
             examples: ["GbR", "OHG", "KG"],
-            source: "RF"
+            source: "Merle"
           },
           {
             type: "Kapitalgesellschaften",
@@ -148,19 +149,19 @@
             pros: ["Haftung auf Einlage beschränkt", "Hohes Ansehen"],
             cons: ["Hohes Stammkapital (GmbH 25k€)", "Bilanzierungspflicht", "Notarpflicht"],
             examples: ["GmbH", "UG (haftungsbeschränkt)", "AG"],
-            source: "RF"
+            source: "Merle"
           }
         ];
 
         const businessPlanChapters = [
-          { title: "1. Executive Summary", content: "Der Pitch: Kompakter Überblick über Idee, Markt und Finanzierung. Muss sitzen!", source: "BP" },
-          { title: "2. Geschäftsidee / Produkt", content: "Detaillierte Problemlösung. Was ist der USP (Alleinstellungsmerkmal)?", source: "BP" },
-          { title: "3. Markt & Wettbewerb", content: "Marktgröße, Zielgruppenanalyse und Konkurrenzbeobachtung.", source: "BP" },
-          { title: "4. Marketing & Vertrieb", content: "STP-Strategie (Segmentierung, Targeting, Positionierung) und die 4Ps.", source: "BP" },
-          { title: "5. Unternehmensorganisation", content: "Rechtsform, Team, Rollenverteilung, Standort.", source: "BP" },
-          { title: "6. SWOT-Analyse", content: "Realistische Einschätzung von Chancen & Risiken. Strategien zur Risikominimierung.", source: "BP" },
-          { title: "7. Finanzplan", content: "Herzstück für Banken: Kapitalbedarf, Liquiditätsplan, GuV, Bilanz.", source: "BP" },
-          { title: "8. Unterlagen", content: "Lebenslauf, Verträge, Genehmigungen als Anhang.", source: "BP" }
+          { title: "1. Executive Summary", content: "Der Pitch: Kompakter Überblick über Idee, Markt und Finanzierung. Muss sitzen!", source: "Jasmin" },
+          { title: "2. Geschäftsidee / Produkt", content: "Detaillierte Problemlösung. Was ist der USP (Alleinstellungsmerkmal)?", source: "Jasmin" },
+          { title: "3. Markt & Wettbewerb", content: "Marktgröße, Zielgruppenanalyse und Konkurrenzbeobachtung.", source: "Jasmin" },
+          { title: "4. Marketing & Vertrieb", content: "STP-Strategie (Segmentierung, Targeting, Positionierung) und die 4Ps.", source: "Jasmin" },
+          { title: "5. Unternehmensorganisation", content: "Rechtsform, Team, Rollenverteilung, Standort.", source: "Jasmin" },
+          { title: "6. SWOT-Analyse", content: "Realistische Einschätzung von Chancen & Risiken. Strategien zur Risikominimierung.", source: "Jasmin" },
+          { title: "7. Finanzplan", content: "Herzstück für Banken: Kapitalbedarf, Liquiditätsplan, GuV, Bilanz.", source: "Jasmin" },
+          { title: "8. Unterlagen", content: "Lebenslauf, Verträge, Genehmigungen als Anhang.", source: "Jasmin" }
         ];
 
         const taxesData = [
@@ -190,12 +191,43 @@
           </span>
         );
 
+        const MockModal = ({ isOpen, onClose, title }) => {
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl relative animate-in zoom-in-95 duration-200">
+                        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                            <X size={24} />
+                        </button>
+                        <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4 mx-auto">
+                            <FileText size={24} />
+                        </div>
+                        <h3 className="text-xl font-bold text-center mb-2 text-slate-900">Dokumenten-Vorschau</h3>
+                        <p className="text-center text-slate-600 mb-6">
+                            Das Dokument <strong>"{title}"</strong> ist in dieser Demo-Version nicht hinterlegt.
+                        </p>
+                        <button onClick={onClose} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-colors">
+                            Verstanden
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
         // --- MAIN APP COMPONENT ---
 
         function App() {
           const [activeTab, setActiveTab] = useState('versicherung');
           const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
           const [scrolled, setScrolled] = useState(false);
+          const [modalOpen, setModalOpen] = useState(false);
+          const [modalDocTitle, setModalDocTitle] = useState('');
+
+          const openDocModal = (title, e) => {
+              if(e) e.preventDefault();
+              setModalDocTitle(title);
+              setModalOpen(true);
+          };
 
           useEffect(() => {
             const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -206,6 +238,8 @@
           return (
             <div className="font-sans text-slate-600 bg-slate-50 selection:bg-amber-100 selection:text-amber-900">
               
+              <MockModal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={modalDocTitle} />
+
               {/* --- NAVIGATION --- */}
               <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-md py-3' : 'bg-transparent py-6'}`}>
                 <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
@@ -459,7 +493,7 @@
                               <h4 className="font-bold text-slate-900">3. Unfall- & Arbeitslosenvers.</h4>
                               <p className="text-sm text-slate-500 mt-1">Arbeitslosenversicherung ist auf Antrag möglich (teuer). BG ist Pflicht für bestimmte Branchen.</p>
                             </div>
-                            <div className="text-right"><SourceBadge code="WBL" /></div>
+                            <div className="text-right"><SourceBadge code="Lea" /></div>
                           </div>
                         </div>
                       </div>
@@ -475,7 +509,7 @@
                               Das Finanzamt fordert Einkommensteuer vierteljährlich im Voraus (10.03., 10.06., 10.09., 10.12.). Lege ca. 30-40% deines Gewinns sofort zurück.
                             </div>
                           </div>
-                          <div className="text-right flex-1"><SourceBadge code="WBL" /></div>
+                          <div className="text-right flex-1"><SourceBadge code="Lea" /></div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -513,7 +547,11 @@
                     <p className="text-slate-600 mb-6">
                       Warum alles selbst zahlen? Deutschland bietet diverse Fördertöpfe für Gründer. Von Zuschüssen bis zu günstigen Krediten.
                     </p>
-                    <a href="#" className="inline-flex items-center gap-2 text-blue-600 font-bold hover:text-blue-700 transition-colors group">
+                    <a 
+                        href="#" 
+                        onClick={(e) => openDocModal('Hilfe für Selbstständige.docx', e)}
+                        className="inline-flex items-center gap-2 text-blue-600 font-bold hover:text-blue-700 transition-colors group"
+                    >
                       Dokument lesen <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
                     </a>
                   </div>
@@ -523,7 +561,7 @@
                       {
                         title: "Gründungszuschuss",
                         org: "Arbeitsagentur",
-                        desc: "Für ALG-1 Empfänger. Sicherung des Lebensunterhalts für 6+9 Monate.",
+                        desc: "Für ALG-1 Empfänger. Sicherung des Lebensunterhalts für 6 - 9 Monate.", // UPDATED
                         tag: "Zuschuss",
                         color: "bg-green-50 text-green-700"
                       },
@@ -557,7 +595,7 @@
                         <p className="text-xs font-bold text-slate-400 uppercase mb-3">{item.org}</p>
                         <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
                         <div className="mt-4 pt-4 border-t border-slate-200 text-right">
-                          <SourceBadge code="HfS" />
+                          <SourceBadge code="Jasmin" />
                         </div>
                       </div>
                     ))}
@@ -580,11 +618,10 @@
                   <div>
                     <h4 className="font-bold text-white uppercase tracking-widest text-xs mb-6">Quellenverzeichnis</h4>
                     <ul className="space-y-2 font-mono text-xs">
-                      <li>[DWzS] Dein Weg zur Selbstständigkeit</li>
-                      <li>[BP] Businessplan.docx</li>
-                      <li>[RF] Rechtsformen.docx</li>
-                      <li>[WBL] wbl lea (2).docx</li>
-                      <li>[HfS] Hilfe für Selbstständige.docx</li>
+                      <li>Jasmin</li>
+                      <li>Elsa</li>
+                      <li>Merle</li>
+                      <li>Lea</li>
                     </ul>
                   </div>
 
@@ -592,7 +629,6 @@
                     <h4 className="font-bold text-white uppercase tracking-widest text-xs mb-6">Projekt</h4>
                     <ul className="space-y-2">
                       <li>Klausur WBL 12/1</li>
-                      <li>Note 1,0 Anforderung</li>
                       <li>Stand: November 2025</li>
                       <li>&copy; Projektteam</li>
                     </ul>
@@ -608,4 +644,3 @@
     </script>
 </body>
 </html>
-
